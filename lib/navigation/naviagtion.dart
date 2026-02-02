@@ -1,7 +1,9 @@
 import 'package:earning_app/global/color.dart';
+import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/navigation/games.dart';
 import 'package:earning_app/navigation/mining.dart';
 import 'package:earning_app/navigation/profile.dart';
+import 'package:earning_app/navigation/user/update.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../navigation/home.dart';
@@ -38,7 +40,7 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
       Profile(),
       Home(),
     ];
-    return Scaffold(
+    return GlobalUser.user.name.isEmpty?Update(user: GlobalUser.user,):Scaffold(
       body: PageView(
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),

@@ -1,3 +1,8 @@
+import 'package:earning_app/game/crossword/screen.dart';
+import 'package:earning_app/game/quiz/quiz.dart';
+import 'package:earning_app/game/spin%20the%20wheel/screen.dart';
+import 'package:earning_app/game/tetris/screen.dart';
+import 'package:earning_app/login/getvalue.dart' show CreateUserScreen;
 import 'package:earning_app/login/login.dart';
 import 'package:earning_app/main.dart';
 import 'package:earning_app/navigation/naviagtion.dart';
@@ -30,40 +35,41 @@ class AppRouter {
     initialLocation: '/splash',
 
     redirect: (context, state) {
-
-      final isReady = startupService.isReady;
       final loggedIn = authService.isLoggedIn;
 
       final isSplash = state.matchedLocation == '/splash';
       final isLogin = state.matchedLocation == '/login';
+      final isCreate = state.matchedLocation == '/create';
 
-      if (!isReady) {
+      if (!loggedIn) {
+        if (isSplash || isLogin) return null;
         return '/splash';
       }
 
-      // Ready but on splash → move on
-      if (isReady && isSplash) {
-        return loggedIn ? '/home' : '/login';
-      }
-
-      // Not logged in → login
-      if (!loggedIn && !isLogin) {
-        return '/login';
+      if (loggedIn && (isSplash || isLogin)) {
+        return '/create';
       }
 
       return null;
     },
 
+
     routes: [
+      GoRoute(
+        path: '/create',
+        builder: (context, state) => CreateUserScreen(),
+      ),
+
+
       GoRoute(
         path: '/splash',
         builder: (context, state) => MyHomePage(title: '',),
       ),
+
       GoRoute(
         path: '/login',
         builder: (context, state) => Login(str: ""),
       ),
-
       GoRoute(
         path: '/home',
         builder: (context, state) => MyNavigationPage(),
@@ -115,6 +121,25 @@ class AppRouter {
       GoRoute(
         path: '/about',
         builder: (context, state) => About(),
+      ),
+
+
+      //Game
+      GoRoute(
+        path: '/spin',
+        builder: (context, state) => SpinWheelPage(),
+      ),
+      GoRoute(
+        path: '/quiz',
+        builder: (context, state) => QuizScreen(),
+      ),
+      GoRoute(
+        path: '/crossword',
+        builder: (context, state) =>CrosswordGamee(),
+      ),
+      GoRoute(
+        path: '/tetris',
+        builder: (context, state) => TetrisScreen(),
       ),
     ],
   );

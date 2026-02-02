@@ -1,5 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:earning_app/login/bloc/bloc.dart';
+import 'package:earning_app/login/bloc/userevent.dart' show RefreshUserEvent;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 class Send{
 
   static void topic(BuildContext context,String str1,String str,{bool b = false}) async{
@@ -34,4 +39,19 @@ class Send{
     ).show(context);
   }
 
+
+  static Future<String> addcoins(BuildContext context, int coins) async {
+    try {
+      await FirebaseFirestore.instance.collection("users")
+          .doc(FirebaseAuth.instance.currentUser!.uid).update({
+        "balance":FieldValue.increment(coins),
+      });
+      context.read<UserBloc>().add(RefreshUserEvent());
+      Send.topic(context, "Success","Your Data is Updated",b: false);
+      return "Success";
+    }catch(e){
+      Send.topic(context, "Error","${e}");
+      return "${e}";
+    }
+  }
 }

@@ -4,6 +4,7 @@ import 'package:earning_app/game/tetris/screen.dart';
 import 'package:earning_app/global/color.dart';
 import 'package:earning_app/model/game.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class CardGame extends StatefulWidget {
@@ -69,7 +70,7 @@ class _CardGameState extends State<CardGame> {
   }
 
   void navigate(){
-    Navigator.push(context, MaterialPageRoute(builder: (_)=>SpinWheelPage()));
+    context.push("/${widget.game.id}");
   }
 
 

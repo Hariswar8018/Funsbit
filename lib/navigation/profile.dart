@@ -1,4 +1,5 @@
 import 'package:earning_app/global/color.dart';
+import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,7 +20,7 @@ class Profile extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 25.0),
                 child: Container(
                   width: w-25,
-                  height: 250,
+                  height: 230,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
@@ -36,42 +37,45 @@ class Profile extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              height: 80,width: 80,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors:[Colors.blue.shade800, Colors.lightBlueAccent.shade100]
-                                )
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 80,width: 80,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors:[Colors.blue.shade800, Colors.lightBlueAccent.shade100]
+                                  )
+                                ),
+                                child: Center(child: Text("${GlobalUser.user.name.isEmpty?"A":GlobalUser.user.name.substring(0,1)}",
+                                  style: TextStyle(fontWeight: FontWeight.w900,fontSize: 35),)),
                               ),
-                              child: Center(child: Text("A",
-                                style: TextStyle(fontWeight: FontWeight.w900,fontSize: 35),)),
-                            ),
-                            SizedBox(width: 15,),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Ayusman Samasi",
-                                  style: TextStyle(fontWeight: FontWeight.w900,fontSize: 20),),
-                                Text("hariswarsamasi@gmail.com",style: TextStyle(fontSize: 10),),
-                                SizedBox(height: 4,),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange.shade50,
-                                    borderRadius: BorderRadius.circular(15)
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 4),
-                                    child: Text("🏆 Miner Level 1"
-                                      ,style: TextStyle(color: Colors.orange,fontWeight: FontWeight.w900, fontSize: 11),),
-                                  ),
-                                )
-                              ],
-                            )
-                          ],
+                              SizedBox(width: 15,),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Ayusman Samasi",
+                                    style: TextStyle(fontWeight: FontWeight.w900,fontSize: 20),),
+                                  Text("${GlobalUser.user.email}",style: TextStyle(fontSize: 10),),
+                                  SizedBox(height: 4,),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.shade50,
+                                      borderRadius: BorderRadius.circular(15)
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 4),
+                                      child: Text("🏆 Miner Level ${GlobalUser.user.level}"
+                                        ,style: TextStyle(color: Colors.orange,fontWeight: FontWeight.w900, fontSize: 11),),
+                                    ),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
                         ),
                         Container(
                           width: w*(7/8),
@@ -86,7 +90,7 @@ class Profile extends StatelessWidget {
                           children: [
                             Column(
                               children: [
-                                Text("0",style: TextStyle(
+                                Text("${GlobalUser.user.balance}",style: TextStyle(
                                   fontSize: 28,fontWeight: FontWeight.w900
                                 ),),
                                 Text("Referrals",style: TextStyle(
@@ -104,7 +108,7 @@ class Profile extends StatelessWidget {
                             ),
                             Column(
                               children: [
-                                Text("0",style: TextStyle(
+                                Text("${GlobalUser.user.walletBalance}",style: TextStyle(
                                     fontSize: 28,fontWeight: FontWeight.w900,
                                   color: Colors.orange
                                 ),),
@@ -149,7 +153,7 @@ class Profile extends StatelessWidget {
                         Text("TOTAL COINS",style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey,fontWeight: FontWeight.w600),),
-                        Text("100",style: TextStyle(
+                        Text("${GlobalUser.user.balance}",style: TextStyle(
                             fontSize: 20,
                             color: GlobalColor.green,fontWeight: FontWeight.w600),),
                       ],

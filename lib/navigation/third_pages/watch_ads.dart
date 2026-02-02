@@ -1,6 +1,8 @@
 import 'package:earning_app/ads/ads_helper.dart';
 import 'package:earning_app/global/color.dart';
+import 'package:earning_app/global/notify.dart';
 import 'package:earning_app/global/widget.dart';
+import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -102,9 +104,15 @@ class _WatchAdsState extends State<WatchAds> {
       },
     );
   }
-  void giveUserReward() {
+  Future<void> giveUserReward() async {
     setState(() {
-
+      progress = true;
+    });
+    await Send.addcoins(context, 500);
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        progress = false;
+      });
     });
   }
 
@@ -122,9 +130,9 @@ class _WatchAdsState extends State<WatchAds> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.diamond_outlined,color: Colors.orange,),
-                Padding(
+                progress ? CircularProgressIndicator():Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: Text("1300",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 23),),
+                  child: Text("${GlobalUser.user.balance}",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 23),),
                 ),
                 Text("Coins",style: TextStyle(fontWeight: FontWeight.w600,fontSize: 19),),
               ],
@@ -281,6 +289,7 @@ class _WatchAdsState extends State<WatchAds> {
       ),
     );
   }
+  bool progress = false;
   Widget icon(String str, String str2)=>ListTile(
     leading: CircleAvatar(
       backgroundColor: Colors.grey.shade200,

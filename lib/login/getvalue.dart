@@ -1,84 +1,67 @@
-import 'package:earning_app/firebase_options.dart';
 import 'package:earning_app/global/color.dart';
+import 'package:earning_app/global/notify.dart';
 import 'package:earning_app/login/auth.dart';
 import 'package:earning_app/login/bloc/bloc.dart';
-import 'package:earning_app/navigation/naviagtion.dart';
-import 'package:earning_app/router/app_router.dart' show AppRouter;
+import 'package:earning_app/login/bloc/state.dart';
+import 'package:earning_app/login/bloc/userevent.dart';
+import 'package:earning_app/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'login/login.dart' show Login;
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+class CreateUserScreen extends StatefulWidget {
+  const CreateUserScreen({super.key});
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  await MobileAds.instance.initialize();
-
-  final authService = AuthService();
-
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider<AuthService>.value(
-          value: authService,
-        ),
-        BlocProvider<UserBloc>(
-          create: (_) => UserBloc(),
-        ),
-      ],
-      child: MyApp(authService: authService),
-    ),
-  );
+  @override
+  State<CreateUserScreen> createState() => _CreateUserScreenState();
 }
 
-class MyApp extends StatelessWidget {
-  final AuthService authService;
+class _CreateUserScreenState extends State<CreateUserScreen> {
 
-  const MyApp({super.key, required this.authService});
+  @override
+  void initState() {
+    super.initState();
+    context.read<UserBloc>().add(LoadUserEvent());
+  }
+
+  void _go(String route) {
+    if (!mounted) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.go(route);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'FunsBit',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+    return Scaffold(
+      body: BlocConsumer<UserBloc, UserState>(
+        listenWhen: (_, state) =>
+        state is UserSuccess || state is UserFailure,
+        listener: (context, state) async {
+          if (state is UserFailure) {
+            Send.topic(
+              context,
+              "Login Required for Security",
+              state.error,
+            );
+            await context.read<AuthService>().logout();
+            _go('/login');
+          }
+          if (state is UserSuccess) {
+            _go('/home');
+          }
+        },
+        builder: (context, state) {
+          return MyHomePage(title: '');
+        },
       ),
-      routerConfig: AppRouter(authService).router,
     );
   }
 }
-
-
-class AppStartupService extends ChangeNotifier {
-
-  bool _isReady = false;
-
-  bool get isReady => _isReady;
-
-  AppStartupService() {
-    _init();
-  }
-
-  Future<void> _init() async {
-    await Future.delayed(Duration(seconds: 3)); // Splash time
-    _isReady = true;
-    notifyListeners();
-  }
-}
-
-
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -97,12 +80,8 @@ class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderState
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 6), // ⏱ 3 sec
     )..forward();
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      context.go('/login');
-    });
   }
 
   @override
@@ -118,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderState
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          image: DecorationImage(image: AssetImage("assets/background.jpg"),fit: BoxFit.cover)
+            image: DecorationImage(image: AssetImage("assets/background.jpg"),fit: BoxFit.cover)
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -156,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderState
                 ),
               ),
             ),
-            Text("Loading Login Screen...",style: TextStyle(fontSize: 11,color: Colors.black),),
+            Text("Loading your Experience...",style: TextStyle(fontSize: 11,color: Colors.black),),
             Spacer(),
             t("@ 2026 FunsBit "),
             t("Version 1.0.0 "),

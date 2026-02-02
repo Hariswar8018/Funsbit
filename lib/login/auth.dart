@@ -1,22 +1,37 @@
-import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService extends ChangeNotifier {
-
   final _auth = FirebaseAuth.instance;
 
-  User? get user => _auth.currentUser;
-
-  bool get isLoggedIn => user != null;
-
   AuthService() {
-    _auth.authStateChanges().listen((user) {
-      notifyListeners();
+    _auth.authStateChanges().listen((_) {
+      notifyListeners(); // 🔥 triggers GoRouter redirect
     });
   }
 
-  Future<void> signInAnonymously() async {
-    await _auth.signInAnonymously();
+  bool get isLoggedIn => _auth.currentUser != null;
+
+  String? get uid => _auth.currentUser?.uid;
+
+  Future<void> login({
+    required String email,
+    required String password,
+  }) async {
+    await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
+  Future<void> register({
+    required String email,
+    required String password,
+  }) async {
+    await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
   Future<void> logout() async {

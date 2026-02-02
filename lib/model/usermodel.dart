@@ -14,9 +14,14 @@ class UserModel {
   final int walletBalance;
   final int withdrawalBalance;
 
-  final int level;
+  final String level;
   final int totalTaps;
   final int totalAdsSeen;
+
+  final String lastSpin;
+  final String lastSpin2;
+  final String lastUse1;
+  final String lastUse2;
 
   UserModel({
     required this.id,
@@ -33,6 +38,10 @@ class UserModel {
     required this.level,
     required this.totalTaps,
     required this.totalAdsSeen,
+    required this.lastSpin,
+    required this.lastSpin2,
+    required this.lastUse1,
+    required this.lastUse2,
   });
 
   Map<String, dynamic> toMap() {
@@ -51,6 +60,10 @@ class UserModel {
       'level': level,
       'totalTaps': totalTaps,
       'totalAdsSeen': totalAdsSeen,
+      'lastSpin': lastSpin,
+      'lastSpin2': lastSpin2,
+      'lastUse1': lastUse1,
+      'lastUse2': lastUse2,
     };
   }
 
@@ -64,13 +77,20 @@ class UserModel {
       lastLogin: map['lastLogin'] ?? '',
       lastCheckIn: map['lastCheckIn'] ?? '',
       gamesPlayed: List<String>.from(map['gamesPlayed'] ?? []),
-      balance: int.tryParse(map['balance'].toString()) ?? 0,
-      walletBalance: int.tryParse(map['walletBalance'].toString()) ?? 0,
+      balance: int.tryParse(map['balance']?.toString() ?? '0') ?? 0,
+      walletBalance:
+      int.tryParse(map['walletBalance']?.toString() ?? '0') ?? 0,
       withdrawalBalance:
-      int.tryParse(map['withdrawalBalance'].toString()) ?? 0,
-      level: int.tryParse(map['level'].toString()) ?? 0,
-      totalTaps: int.tryParse(map['totalTaps'].toString()) ?? 0,
-      totalAdsSeen: int.tryParse(map['totalAdsSeen'].toString()) ?? 0,
+      int.tryParse(map['withdrawalBalance']?.toString() ?? '0') ?? 0,
+      level: map['level'] ?? '1',
+      totalTaps:
+      int.tryParse(map['totalTaps']?.toString() ?? '0') ?? 0,
+      totalAdsSeen:
+      int.tryParse(map['totalAdsSeen']?.toString() ?? '0') ?? 0,
+      lastSpin: map['lastSpin'] ?? '',
+      lastSpin2: map['lastSpin2'] ?? '',
+      lastUse1: map['lastUse1'] ?? '',
+      lastUse2: map['lastUse2'] ?? '',
     );
   }
 }

@@ -2,6 +2,7 @@
 
 import 'package:earning_app/ads/ads_helper.dart';
 import 'package:earning_app/global/color.dart';
+import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/model/game.dart';
 import 'package:flutter/material.dart';
 import 'package:earning_app/card/home_game_card.dart';
@@ -77,7 +78,7 @@ class _HomeState extends State<Home> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Welcome back,",style: TextStyle(        height: 1, fontSize: 13,color: Colors.grey.shade700),),
-                        Text("Ayusman",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 15,height: 1),),
+                        Text("${GlobalUser.user.name.isEmpty?"New User":GlobalUser.user.name}",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 15,height: 1),),
                         SizedBox(height: 7,),
                       ],
                     ),
@@ -116,10 +117,9 @@ class _HomeState extends State<Home> {
                                 fontSize: 13,fontWeight: FontWeight.w600,
                               color: Colors.grey
                             ),),
-                            Text("1,195",style: TextStyle(
+                            Text("${GlobalUser.user.balance}",style: TextStyle(
                                 fontSize: 20,fontWeight: FontWeight.w900
                             ),),
-        
                           ],
                         ),
                         Container(
@@ -132,11 +132,11 @@ class _HomeState extends State<Home> {
                         ),
                         Column(
                           children: [
-                            Text("Miner Level",style: TextStyle(
+                            Text("My Level",style: TextStyle(
                                 fontSize: 13,fontWeight: FontWeight.w600,
                                 color: Colors.grey
                             ),),
-                            Text("Lvl. 1",style: TextStyle(
+                            Text("Lvl. ${GlobalUser.user.level}",style: TextStyle(
                                 fontSize: 20,fontWeight: FontWeight.w900
                             ),),
                           ],
@@ -154,7 +154,7 @@ class _HomeState extends State<Home> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Boost Mining",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w800),),
+                          Text("Boost My Level",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w800),),
                           Text("⚡",style: TextStyle(color: Colors.yellowAccent,fontWeight: FontWeight.w800),),
                         ],
                       ),

@@ -1,9 +1,11 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:earning_app/global/notify.dart';
+import 'package:earning_app/login/auth.dart';
 import 'package:earning_app/model/usermodel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,7 +63,7 @@ class _LoginState extends State<Login> {
     super.dispose();
   }
 
-  bool create = true;
+  bool create =false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +83,7 @@ class _LoginState extends State<Login> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 35,),
+              SizedBox(height: 85,),
               Container(
                 width: 120,height: 120,
                 decoration: BoxDecoration(
@@ -104,7 +106,7 @@ class _LoginState extends State<Login> {
               SizedBox(height: 35,),
               Container(
                 width: w-30,
-                height: h,
+                height: h-240,
                 decoration: BoxDecoration(
                     color: Colors.white,
                     boxShadow: [
@@ -131,15 +133,11 @@ class _LoginState extends State<Login> {
                             fontSize: 12,fontWeight: FontWeight.w400),
                       ),),
                       SizedBox(height: 20,),
-                      c(name, "Your Name",Icon(Icons.person)),
-                      SizedBox(height: 10,),
                       c(email, "Your Email Address",Icon(Icons.email_sharp)),
                       SizedBox(height: 10,),
                       c(passwordC, "Your Password",Icon(Icons.password)),
                       SizedBox(height: 10,),
                       c(confirm, "Confirm Password",Icon(Icons.password_sharp)),
-                      SizedBox(height: 10,),
-                      c(usernameC, "Your Phone Number",Icon(Icons.phone)),
                       SizedBox(height: 10,),
                       c(coupon, "Your Coupon Code ( Optional ) ",Icon(Icons.control_point_duplicate_outlined)),
                       SizedBox(height: 20,),
@@ -149,22 +147,19 @@ class _LoginState extends State<Login> {
                             Send.topic(context, "Password don't match", "Your Both Password don't match");
                             return ;
                           }
-                          final ids = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                              email: email.text, password:passwordC.text
-                          );
-                          String id = ids.user!.uid ?? "";
-                          UserModel user = UserModel(
-                              id: id, name: name.text, password: passwordC.text,
-                              phone: usernameC.text, email: email.text, lastLogin:DateTime.now().toString(),
-                              lastCheckIn: DateTime.now().toString(), gamesPlayed: [],
-                              balance: 0, walletBalance: 0,
-                              withdrawalBalance: 0, level: 0,
-                              totalTaps: 0, totalAdsSeen:0
-                          );
-                          await FirebaseFirestore.instance.collection("users").doc().set(user.toMap());
-
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>MyNavigationPage()));
-                        },
+                            try {
+                              final SharedPreferences prefs = await SharedPreferences.getInstance();
+                              await prefs.setString('coupon', coupon.text.trim());
+                              await context.read<AuthService>().register(
+                                email: email.text.trim(),
+                                password: passwordC.text.trim(),
+                              );
+                            } catch (e) {
+                              print(e);
+                              Send.topic(context, "Registration Failed", e.toString());
+                            }
+                          return ;
+                          },
                         child: Container(
                           width: MediaQuery.of(context).size.width - 20,
                           height: 60,
@@ -284,7 +279,18 @@ class _LoginState extends State<Login> {
                     c(passwordC, "Your Password",Icon(Icons.password_sharp)),
                     SizedBox(height: 20,),
                     InkWell(
-                      onTap: login,
+                      onTap:() async {
+                        try {
+                          await context.read<AuthService>().login(
+                            email: email.text.trim(),
+                            password: passwordC.text.trim(),
+                          );
+
+                          // 🔥 GoRouter handles redirect
+                        } catch (e) {
+                          Send.topic(context, "Login Failed", e.toString());
+                        }
+                      },
                       child: Container(
                         width: MediaQuery.of(context).size.width - 20,
                         height: 60,
