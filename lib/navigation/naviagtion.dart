@@ -1,8 +1,12 @@
 import 'package:earning_app/global/color.dart';
+import 'package:earning_app/navigation/games.dart';
+import 'package:earning_app/navigation/mining.dart';
+import 'package:earning_app/navigation/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:water_drop_nav_bar/water_drop_nav_bar.dart' show WaterDropNavBar, BarItem;
 import '../navigation/home.dart';
+import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
+
 
 class MyNavigationPage extends StatefulWidget {
   const MyNavigationPage({Key? key}) : super(key: key);
@@ -12,84 +16,101 @@ class MyNavigationPage extends StatefulWidget {
 }
 
 class _MyNavigationPageState extends State<MyNavigationPage> {
-  final Color navigationBarColor = Colors.white;
-  int selectedIndex = 0;
-  late PageController pageController;
+  final _pageController = PageController(initialPage: 0);
+
+  final NotchBottomBarController _controller = NotchBottomBarController(index: 0);
+
+  int maxCount = 5;
+
   @override
-  void initState() {
-    super.initState();
-    pageController = PageController(initialPage: selectedIndex);
+  void dispose() {
+    _pageController.dispose();
+
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        systemNavigationBarColor: navigationBarColor,
-        systemNavigationBarIconBrightness: Brightness.dark,
+    final List<Widget> bottomBarPages = [
+      Home(),
+      Gamess(),
+      Level(),
+      Profile(),
+      Home(),
+    ];
+    return Scaffold(
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: List.generate(bottomBarPages.length, (index) => bottomBarPages[index]),
       ),
-      child: Scaffold(
-        body: PageView(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: pageController,
-          children: <Widget>[
-            Home(),
-            Container(
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.favorite_rounded,
-                size: 56,
-                color: Colors.red[400],
-              ),
+      extendBody: true,
+      bottomNavigationBar: (bottomBarPages.length <= maxCount)
+          ? AnimatedNotchBottomBar(
+        notchBottomBarController: _controller,
+        color: Colors.white,
+        showLabel: true,
+        textOverflow: TextOverflow.visible,
+        maxLine: 1,
+        shadowElevation: 5,
+        kBottomRadius: 28.0,
+        notchColor: Colors.black87,
+        removeMargins: false,
+        bottomBarWidth: 500,
+        showShadow: true,
+        durationInMilliSeconds: 300,
+        itemLabelStyle: const TextStyle(fontSize: 10),
+        elevation: 1,
+        bottomBarItems:  [
+          BottomBarItem(
+            inActiveItem: Icon(
+              Icons.home_filled,
+              color: Colors.blueGrey,
             ),
-            Container(
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.email_rounded,
-                size: 56,
-                color: Colors.green[400],
-              ),
+            activeItem: Icon(
+              Icons.home_filled,
+              color: Colors.blueAccent,
             ),
-            Container(
-              alignment: Alignment.center,
-              child: Icon(
-                Icons.folder_rounded,
-                size: 56,
-                color: Colors.blue[400],
-              ),
+            itemLabel: 'Home',
+          ),
+          BottomBarItem(
+            inActiveItem: Icon(Icons.gamepad, color: Colors.blueGrey),
+            activeItem: Icon(
+              Icons.games_rounded,
+              color: Colors.blueAccent,
             ),
-          ],
-        ),
-        bottomNavigationBar: WaterDropNavBar(
-          backgroundColor: navigationBarColor,
-          onItemSelected: (int index) {
-            setState(() {
-              selectedIndex = index;
-            });
-            pageController.animateToPage(selectedIndex,
-                duration: const Duration(milliseconds: 400),
-                curve: Curves.easeOutQuad);
-          },
-          selectedIndex: selectedIndex,
-          barItems: <BarItem>[
-            BarItem(
-              filledIcon: Icons.home,
-              outlinedIcon: Icons.home_filled,
+            itemLabel: 'Games',
+          ),
+          BottomBarItem(
+            inActiveItem: Icon(
+              Icons.money_off_csred_outlined,
+              color: Colors.blueGrey,
             ),
-            BarItem(
-                filledIcon: Icons.favorite_rounded,
-                outlinedIcon: Icons.favorite_border_rounded),
-            BarItem(
-              filledIcon: Icons.email_rounded,
-              outlinedIcon: Icons.email_outlined,
+            activeItem: Icon(
+              Icons.settings,
+              color: Colors.pink,
             ),
-            BarItem(
-              filledIcon: Icons.folder_rounded,
-              outlinedIcon: Icons.folder_outlined,
+            itemLabel: 'Level',
+          ),
+          BottomBarItem(
+            inActiveItem: Icon(
+              Icons.person,
+              color: Colors.blueGrey,
             ),
-          ],waterDropColor: GlobalColor.green,
-        ),
-      ),
+            activeItem: Icon(
+              Icons.person,
+              color: Colors.yellow,
+            ),
+            itemLabel: 'Page 4',
+          ),
+        ],
+        onTap: (index) {
+          _pageController.jumpToPage(index);
+        },
+        kIconSize: 24.0,
+
+      )
+          : null,
     );
   }
 }

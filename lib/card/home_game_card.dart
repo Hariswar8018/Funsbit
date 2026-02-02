@@ -1,25 +1,91 @@
+import 'package:earning_app/ads/ads_helper.dart';
+import 'package:earning_app/game/spin%20the%20wheel/screen.dart';
 import 'package:earning_app/game/tetris/screen.dart';
 import 'package:earning_app/global/color.dart';
 import 'package:earning_app/model/game.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-class CardGame extends StatelessWidget {
+class CardGame extends StatefulWidget {
   final Games game;
   const CardGame({super.key,required this.game});
+
+  @override
+  State<CardGame> createState() => _CardGameState();
+}
+
+class _CardGameState extends State<CardGame> {
+  InterstitialAd? _interstitialAd;
+
+  @override
+  void initState(){
+    super.initState();
+    loadInterstitialAd();
+  }
+  void loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: AdHelper.getInterstitial(0),
+
+      request: const AdRequest(),
+
+      adLoadCallback: InterstitialAdLoadCallback(
+
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+          print('Interstitial Loaded');
+        },
+
+        onAdFailedToLoad: (error) {
+          print('Interstitial failed: $error');
+        },
+      ),
+    );
+  }
+  void showInterstitialAd() {
+    if (_interstitialAd == null) {
+      print('Interstitial not ready');
+      navigate();
+      return;
+    }
+
+    _interstitialAd!.fullScreenContentCallback =
+        FullScreenContentCallback(
+          onAdDismissedFullScreenContent: (ad) {
+            ad.dispose();
+            _interstitialAd = null;
+            navigate();
+            loadInterstitialAd(); // preload next
+          },
+
+          onAdFailedToShowFullScreenContent: (ad, error) {
+            ad.dispose();
+            _interstitialAd = null;
+            navigate();
+            loadInterstitialAd();
+        }
+        );
+
+    _interstitialAd!.show();
+  }
+
+  void navigate(){
+    Navigator.push(context, MaterialPageRoute(builder: (_)=>SpinWheelPage()));
+  }
+
 
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
     return InkWell(
-      onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (_)=>TetrisScreen()));
+      onTap: () async {
+         showInterstitialAd();
       },
       child: Container(
         width: w/2-10,
         height: w/2-5,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          image: DecorationImage(image: AssetImage(game.image),fit: BoxFit.cover)
+          image: DecorationImage(image: AssetImage(widget.game.image),fit: BoxFit.cover)
         ),
         child: Column(
           children: [
@@ -44,7 +110,7 @@ class CardGame extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(game.name,style: TextStyle(
+                        Text(widget.game.name,style: TextStyle(
                           color: Colors.white,fontWeight:
                             FontWeight.w900,fontSize: w/19
                         ),),
@@ -52,10 +118,10 @@ class CardGame extends StatelessWidget {
                           children: [
                             Icon(Icons.circle,color: Colors.green,size: 19,),
                             SizedBox(width: 4),
-                            Text(game.totalplay.toString()+" Playing",style: TextStyle(color: Colors.white,
+                            Text(formatNumber(widget.game.totalplaying).toString()+" Playing",style: TextStyle(color: Colors.white,
                             fontWeight: FontWeight.w700, fontSize: w/34),)
                           ],
-                        )
+                        ),
                       ],
                     ),
                     CircleAvatar(
@@ -70,5 +136,17 @@ class CardGame extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String formatNumber(int value) {
+    if (value >= 1000000000) {
+      return (value / 1000000000).toStringAsFixed(1) + 'B';
+    } else if (value >= 1000000) {
+      return (value / 1000000).toStringAsFixed(1) + 'M';
+    } else if (value >= 1000) {
+      return (value / 1000).toStringAsFixed(1) + 'K';
+    } else {
+      return value.toString();
+    }
   }
 }

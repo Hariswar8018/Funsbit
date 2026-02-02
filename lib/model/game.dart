@@ -35,6 +35,10 @@ class Games {
 }
 
 List<Games> games = [
-  Games(id: "", name: "Tetris", image: "assets/tetris.png", totalplay: 12000, totalplaying: 4000),
-  Games(id: "", name: "Quiz", image: "assets/quiz.png", totalplay: 500000, totalplaying: 2000),
+
+  Games(id: "", name: "Tetris", image: "assets/tetris.png", totalplay: 122112, totalplaying: 577554),
+  Games(id: "", name: "Quiz", image: "assets/quiz.png", totalplay: 532211, totalplaying: 45245),
+  Games(id: "", name: "SpinWheel", image: "assets/spin.png", totalplay: 383989, totalplaying: 23536),
+  Games(id: "", name: "Crossword", image: "assets/crossworord.png", totalplay: 2837292, totalplaying: 245425),
+
 ];

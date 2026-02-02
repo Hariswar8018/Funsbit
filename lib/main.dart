@@ -1,6 +1,8 @@
 import 'package:earning_app/firebase_options.dart';
 import 'package:earning_app/global/color.dart';
+import 'package:earning_app/login/auth.dart';
 import 'package:earning_app/navigation/naviagtion.dart';
+import 'package:earning_app/router/app_router.dart' show AppRouter;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,23 +19,44 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await MobileAds.instance.initialize();
-  runApp(const MyApp());
+  runApp( MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+   MyApp({super.key});
 
+  final authService = AuthService();
+  late AppRouter appRouter = AppRouter(authService);
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return MaterialApp.router(
+      title: 'FunsBit',
       theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: .fromSeed(seedColor: Colors.white),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      routerConfig: appRouter.router,
     );
   }
 }
+
+
+class AppStartupService extends ChangeNotifier {
+
+  bool _isReady = false;
+
+  bool get isReady => _isReady;
+
+  AppStartupService() {
+    _init();
+  }
+
+  Future<void> _init() async {
+    await Future.delayed(Duration(seconds: 3)); // Splash time
+    _isReady = true;
+    notifyListeners();
+  }
+}
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -55,7 +78,6 @@ class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderState
       vsync: this,
       duration: const Duration(seconds: 3), // ⏱ 3 sec
     )..forward();
-    _navigate();
   }
 
   @override
