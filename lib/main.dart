@@ -1,19 +1,28 @@
+import 'package:earning_app/firebase_options.dart';
 import 'package:earning_app/global/color.dart';
+import 'package:earning_app/navigation/naviagtion.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login/login.dart' show Login;
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await MobileAds.instance.initialize();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -55,36 +64,30 @@ class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderState
     super.dispose();
   }
   Future<void> _navigate() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String s = await prefs.getString('username')??"NA";
-    if(s!="NA"){
-      Future.delayed(const Duration(seconds: 3), () async {
-        if (!mounted) return;
+    User? user = FirebaseAuth.instance.currentUser;
+    Future.delayed(const Duration(seconds: 3), () async {
+      if (!mounted) return;
+      if(user!=null){
+        Navigator.pushReplacement(
+          context,
+          PageTransition(
+            type: PageTransitionType.fade,
+            childBuilder: (context) => MyNavigationPage(),
+          ),
+        );
+      }else{
         Navigator.pushReplacement(
           context,
           PageTransition(
             type: PageTransitionType.fade,
             childBuilder: (context) => Login(
-              str: s,
+              str: "",
             ),
           ),
         );
-      });
-    }else{
-      Future.delayed(const Duration(seconds: 3), () async {
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          PageTransition(
-            type: PageTransitionType.leftToRight,duration: Duration(milliseconds: 300),
-            childBuilder: (context) => Login(
-              str: s,
-            ),
-          ),
-        );
-      });
-    }
+      }
 
+    });
   }
 
   @override

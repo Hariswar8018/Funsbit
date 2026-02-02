@@ -63,6 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '930069007672',
     projectId: 'funsbit',
     storageBucket: 'funsbit.firebasestorage.app',
+    iosClientId: '930069007672-q72ufhukaa0ercfb76lh3n1botaod4vh.apps.googleusercontent.com',
     iosBundleId: 'com.starwish.funsbit',
   );
+
 }

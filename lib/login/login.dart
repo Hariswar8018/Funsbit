@@ -1,4 +1,8 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:earning_app/global/notify.dart';
+import 'package:earning_app/model/usermodel.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
@@ -45,6 +49,11 @@ class _LoginState extends State<Login> {
     debugPrint('Password: $password');
   }
 
+  void toggle(){
+    setState(() {
+      create=!create;
+    });
+  }
   @override
   void dispose() {
     usernameC.dispose();
@@ -122,27 +131,39 @@ class _LoginState extends State<Login> {
                             fontSize: 12,fontWeight: FontWeight.w400),
                       ),),
                       SizedBox(height: 20,),
-                      c(usernameC, "Your Name"),
+                      c(name, "Your Name",Icon(Icons.person)),
                       SizedBox(height: 10,),
-                      c(passwordC, "Your Email Address"),
+                      c(email, "Your Email Address",Icon(Icons.email_sharp)),
                       SizedBox(height: 10,),
-                      c(passwordC, "Your Password"),
+                      c(passwordC, "Your Password",Icon(Icons.password)),
                       SizedBox(height: 10,),
-                      c(passwordC, "Confirm Password"),
+                      c(confirm, "Confirm Password",Icon(Icons.password_sharp)),
                       SizedBox(height: 10,),
-                      c(passwordC, "Your Phone Number"),
+                      c(usernameC, "Your Phone Number",Icon(Icons.phone)),
                       SizedBox(height: 10,),
-                      c(passwordC, "Your Coupon"),
+                      c(coupon, "Your Coupon Code ( Optional ) ",Icon(Icons.control_point_duplicate_outlined)),
                       SizedBox(height: 20,),
                       InkWell(
-                        onTap: (){
-                          Navigator.pushReplacement(
-                            context,
-                            PageTransition(
-                              type: PageTransitionType.fade,
-                              childBuilder: (context) => MyNavigationPage()
-                            ),
+                        onTap: () async {
+                          if(confirm.text.trim()!=passwordC.text.trim()){
+                            Send.topic(context, "Password don't match", "Your Both Password don't match");
+                            return ;
+                          }
+                          final ids = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                              email: email.text, password:passwordC.text
                           );
+                          String id = ids.user!.uid ?? "";
+                          UserModel user = UserModel(
+                              id: id, name: name.text, password: passwordC.text,
+                              phone: usernameC.text, email: email.text, lastLogin:DateTime.now().toString(),
+                              lastCheckIn: DateTime.now().toString(), gamesPlayed: [],
+                              balance: 0, walletBalance: 0,
+                              withdrawalBalance: 0, level: 0,
+                              totalTaps: 0, totalAdsSeen:0
+                          );
+                          await FirebaseFirestore.instance.collection("users").doc().set(user.toMap());
+
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=>MyNavigationPage()));
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width - 20,
@@ -172,18 +193,21 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                       SizedBox(height: 15,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Not New? ",style: GoogleFonts.roboto(
-                            textStyle: const TextStyle(color: Colors.black,
-                                fontSize: 17,fontWeight: FontWeight.w600),
-                          ),),
-                          Text("Login",style: GoogleFonts.roboto(
-                            textStyle: const TextStyle(color: Colors.blue,
-                                fontSize: 17,fontWeight: FontWeight.w900),
-                          ),),
-                        ],
+                      InkWell(
+                        onTap: toggle,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Not New? ",style: GoogleFonts.roboto(
+                              textStyle: const TextStyle(color: Colors.black,
+                                  fontSize: 17,fontWeight: FontWeight.w600),
+                            ),),
+                            Text("Login",style: GoogleFonts.roboto(
+                              textStyle: const TextStyle(color: Colors.blue,
+                                  fontSize: 17,fontWeight: FontWeight.w900),
+                            ),),
+                          ],
+                        ),
                       )
                     ],
                   ),
@@ -255,9 +279,9 @@ class _LoginState extends State<Login> {
                           fontSize: 12,fontWeight: FontWeight.w400),
                     ),),
                     SizedBox(height: 20,),
-                    c(usernameC, "Your Phone Number"),
+                    c(usernameC, "Your Phone Number",Icon(Icons.email_rounded)),
                     SizedBox(height: 10,),
-                    c(passwordC, "Your Password"),
+                    c(passwordC, "Your Password",Icon(Icons.password_sharp)),
                     SizedBox(height: 20,),
                     InkWell(
                       onTap: login,
@@ -289,18 +313,21 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     SizedBox(height: 15,),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Don't Have? ",style: GoogleFonts.roboto(
-                          textStyle: const TextStyle(color: Colors.black,
-                              fontSize: 17,fontWeight: FontWeight.w600),
-                        ),),
-                        Text("Create Account",style: GoogleFonts.roboto(
-                          textStyle: const TextStyle(color: Colors.blue,
-                              fontSize: 17,fontWeight: FontWeight.w900),
-                        ),),
-                      ],
+                    InkWell(
+                      onTap: toggle,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Don't Have? ",style: GoogleFonts.roboto(
+                            textStyle: const TextStyle(color: Colors.black,
+                                fontSize: 17,fontWeight: FontWeight.w600),
+                          ),),
+                          Text("Create Account",style: GoogleFonts.roboto(
+                            textStyle: const TextStyle(color: Colors.blue,
+                                fontSize: 17,fontWeight: FontWeight.w900),
+                          ),),
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -312,7 +339,7 @@ class _LoginState extends State<Login> {
       ),
     );
   }
-  Widget c(TextEditingController c, String str){
+  Widget c(TextEditingController c, String str, Widget icon){
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: TextField(
@@ -321,6 +348,7 @@ class _LoginState extends State<Login> {
         cursorColor: Colors.black,
         decoration:  InputDecoration(
           hintText: str,
+          prefixIcon: icon,
           labelStyle: TextStyle(color: Colors.black),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black),

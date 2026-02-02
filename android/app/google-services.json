@@ -12,7 +12,12 @@
           "package_name": "com.starwish.funsbit"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "930069007672-104g2k7l5jeebi9q87o53fsff548ohlg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAXxtU_eVkyX8Z2aLrhXB-vAIYeXXzeroo"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "930069007672-104g2k7l5jeebi9q87o53fsff548ohlg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "930069007672-q72ufhukaa0ercfb76lh3n1botaod4vh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.starwish.funsbit"
+              }
+            }
+          ]
         }
       }
     }
