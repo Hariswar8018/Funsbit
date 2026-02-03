@@ -9,7 +9,8 @@ import 'package:earning_app/card/home_game_card.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 class Home extends StatefulWidget {
-  const Home({super.key});
+  const Home({super.key, required this.onFallback});
+  final void Function(int index) onFallback;
 
   @override
   State<Home> createState() => _HomeState();
@@ -144,19 +145,24 @@ class _HomeState extends State<Home> {
                       ],
                     ),
                     Spacer(),
-                    Container(
-                      width: w-60,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: GlobalColor.black,
-                        borderRadius: BorderRadius.circular(10)
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Boost My Level",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w800),),
-                          Text("⚡",style: TextStyle(color: Colors.yellowAccent,fontWeight: FontWeight.w800),),
-                        ],
+                    InkWell(
+                      onTap: (){
+                        widget.onFallback(2);
+                      },
+                      child: Container(
+                        width: w-60,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: GlobalColor.black,
+                          borderRadius: BorderRadius.circular(10)
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Boost My Level",style: TextStyle(color: Colors.white,fontWeight: FontWeight.w800),),
+                            Text("⚡",style: TextStyle(color: Colors.yellowAccent,fontWeight: FontWeight.w800),),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -187,7 +193,11 @@ class _HomeState extends State<Home> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Featured Games",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 18),),
-                  Text("See All",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 16,color: GlobalColor.green),),
+                  InkWell(
+                      onTap: (){
+                        widget.onFallback(1);
+                      },
+                      child: Text("See All",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 16,color: Colors.black),)),
                 ],
               ),
             ),

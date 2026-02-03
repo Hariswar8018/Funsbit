@@ -23,6 +23,12 @@ class UserModel {
   final String lastUse1;
   final String lastUse2;
 
+  // 🔹 NEW FIELDS
+  final int referral;
+  final List<String> myReferral;
+  final String myReferralCode;
+  final int totalDone;
+
   UserModel({
     required this.id,
     required this.name,
@@ -42,6 +48,12 @@ class UserModel {
     required this.lastSpin2,
     required this.lastUse1,
     required this.lastUse2,
+
+    // 🔹 NEW
+    required this.referral,
+    required this.myReferral,
+    required this.myReferralCode,
+    required this.totalDone,
   });
 
   Map<String, dynamic> toMap() {
@@ -64,6 +76,12 @@ class UserModel {
       'lastSpin2': lastSpin2,
       'lastUse1': lastUse1,
       'lastUse2': lastUse2,
+
+      // 🔹 NEW
+      'referral': referral,
+      'myReferral': myReferral,
+      'myReferralCode': myReferralCode,
+      'totalDone': totalDone,
     };
   }
 
@@ -91,6 +109,12 @@ class UserModel {
       lastSpin2: map['lastSpin2'] ?? '',
       lastUse1: map['lastUse1'] ?? '',
       lastUse2: map['lastUse2'] ?? '',
+
+      // 🔹 NEW
+      referral: int.tryParse(map['referral']?.toString() ?? '0') ?? 0,
+      myReferral: List<String>.from(map['myReferral'] ?? []),
+      myReferralCode: map['myReferralCode'] ?? '',
+      totalDone: int.tryParse(map['totalDone']?.toString() ?? '0') ?? 0,
     );
   }
 }

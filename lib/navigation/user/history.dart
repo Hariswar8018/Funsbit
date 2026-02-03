@@ -1,73 +1,25 @@
-import 'package:earning_app/global/color.dart';
 import 'package:earning_app/global/widget.dart';
-import 'package:earning_app/login/bloc/bloc.dart';
-import 'package:earning_app/model/transaction.dart';
+import 'package:earning_app/model/transaction.dart' show TransactionModel;
 import 'package:earning_app/navigation/user/service/transaction.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-class Wallet extends StatefulWidget {
-  const Wallet({super.key});
+class History extends StatefulWidget {
+  const History({super.key});
 
   @override
-  State<Wallet> createState() => _WalletState();
+  State<History> createState() => _HistoryState();
 }
 
-class _WalletState extends State<Wallet> {
+class _HistoryState extends State<History> {
 
   final service = TransactionService();
 
   @override
   Widget build(BuildContext context) {
-    double w=MediaQuery.of(context).size.width;
     return Scaffold(
       body: Column(
         children: [
-          GlobalWidget.appbar(context, "My Wallet"),
-          SizedBox(height: 20,),
-          InkWell(
-            child: Container(
-              width: w-25,
-              height: 90,
-              decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(20)
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Row(
-                  children: [
-                    Container(
-                        decoration: BoxDecoration(
-                            color: Colors.green.shade700,
-                            borderRadius: BorderRadius.circular(10)
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(Icons.diamond_outlined, color: GlobalColor.green,size: 34,),
-                        )),
-                    SizedBox(width: 10,),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("TOTAL COINS",style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey,fontWeight: FontWeight.w600),),
-                        Text("${GlobalUser.user.balance}",style: TextStyle(
-                            fontSize: 20,
-                            color: GlobalColor.green,fontWeight: FontWeight.w600),),
-                      ],
-                    ),
-                    Spacer(),
-                    Icon(Icons.arrow_forward,color: Colors.white,),
-                    SizedBox(width: 10,)
-                  ],
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: 20,),
+          GlobalWidget.appbar(context, "Your Transactions"),
           Flexible(
             child: StreamBuilder<List<TransactionModel>>(
               stream: service.getTransactions(),

@@ -13,18 +13,18 @@ class FirestoreService {
   }
 
   static Future<List<QuizQuestion>> fetchRandomQuiz() async {
-    final snapshot = await _db.collection("Quiz").get();
+    final snapshot = await FirebaseFirestore.instance
+        .collection("quiz")
+        .limit(10)
+        .get();
 
-    if (snapshot.docs.length < 10) {
-      throw Exception("Not enough Firestore quiz");
+    if (snapshot.docs.isEmpty) {
+      return []; // 🔥 NEVER throw
     }
 
-    final all = snapshot.docs
-        .map((e) => QuizQuestion.fromMap(e.data()))
+    return snapshot.docs
+        .map((d) => QuizQuestion.fromMap(d.data()))
         .toList();
-
-    all.shuffle(Random());
-
-    return all.take(10).toList();
   }
+
 }

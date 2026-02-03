@@ -7,7 +7,7 @@ class AdHelper {
   // =========================
   // false = Test Ads
   // true  = Real Ads
-  static bool isTest = false;
+  static bool isTest = true;
 
 
   // Banner
@@ -40,9 +40,9 @@ class AdHelper {
 
   // Banner (3)
   static const List<String> _realBannerAndroid = [
-    'ca-app-pub-xxxxxxxxx/banner1',
-    'ca-app-pub-xxxxxxxxx/banner2',
-    'ca-app-pub-xxxxxxxxx/banner3',
+    'ca-app-pub-2814821888454521/3880198230',
+    'ca-app-pub-2814821888454521/2408060811',
+    'ca-app-pub-2814821888454521/2220358551',
   ];
 
   static const List<String> _realBannerIOS = [
@@ -53,11 +53,11 @@ class AdHelper {
 
   // Interstitial (5)
   static const List<String> _realInterstitialAndroid = [
-    'ca-app-pub-xxxxxxxxx/inter1',
-    'ca-app-pub-xxxxxxxxx/inter2',
-    'ca-app-pub-xxxxxxxxx/inter3',
-    'ca-app-pub-xxxxxxxxx/inter4',
-    'ca-app-pub-xxxxxxxxx/inter5',
+    'ca-app-pub-2814821888454521/5284779243',
+    'ca-app-pub-2814821888454521/3971697572',
+    'ca-app-pub-2814821888454521/9907276885',
+    'ca-app-pub-2814821888454521/7296699066',
+    'ca-app-pub-2814821888454521/5500401660',
   ];
 
   static const List<String> _realInterstitialIOS = [
@@ -70,11 +70,11 @@ class AdHelper {
 
   // Rewarded (5)
   static const List<String> _realRewardedAndroid = [
-    'ca-app-pub-xxxxxxxxx/reward1',
-    'ca-app-pub-xxxxxxxxx/reward2',
-    'ca-app-pub-xxxxxxxxx/reward3',
-    'ca-app-pub-xxxxxxxxx/reward4',
-    'ca-app-pub-xxxxxxxxx/reward5',
+    'ca-app-pub-2814821888454521/5257585431',
+    'ca-app-pub-2814821888454521/7627871557',
+    'ca-app-pub-2814821888454521/2874238321',
+    'ca-app-pub-2814821888454521/1561156659',
+    'ca-app-pub-2814821888454521/2874238321',
   ];
 
   static const List<String> _realRewardedIOS = [
@@ -87,8 +87,8 @@ class AdHelper {
 
   // Native (2)
   static const List<String> _realNativeAndroid = [
-    'ca-app-pub-xxxxxxxxx/native1',
-    'ca-app-pub-xxxxxxxxx/native2',
+    'ca-app-pub-2814821888454521/6314789884',
+    'ca-app-pub-2814821888454521/5001708213',
   ];
 
   static const List<String> _realNativeIOS = [

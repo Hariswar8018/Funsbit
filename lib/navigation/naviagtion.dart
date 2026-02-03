@@ -21,7 +21,13 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
   final _pageController = PageController(initialPage: 0);
 
   final NotchBottomBarController _controller = NotchBottomBarController(index: 0);
+  void openFallbackScreen(int index) {
+    _controller.index=index;
+    _pageController.jumpToPage(index);
+    setState(() {
 
+    });
+  }
   int maxCount = 5;
 
   @override
@@ -34,85 +40,119 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> bottomBarPages = [
-      Home(),
+      Home(onFallback: openFallbackScreen),
       Gamess(),
       Level(),
       Profile(),
-      Home(),
     ];
-    return GlobalUser.user.name.isEmpty?Update(user: GlobalUser.user,):Scaffold(
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        children: List.generate(bottomBarPages.length, (index) => bottomBarPages[index]),
-      ),
-      extendBody: true,
-      bottomNavigationBar: (bottomBarPages.length <= maxCount)
-          ? AnimatedNotchBottomBar(
-        notchBottomBarController: _controller,
-        color: Colors.white,
-        showLabel: true,
-        textOverflow: TextOverflow.visible,
-        maxLine: 1,
-        shadowElevation: 5,
-        kBottomRadius: 28.0,
-        notchColor: Colors.black87,
-        removeMargins: false,
-        bottomBarWidth: 500,
-        showShadow: true,
-        durationInMilliSeconds: 300,
-        itemLabelStyle: const TextStyle(fontSize: 10),
-        elevation: 1,
-        bottomBarItems:  [
-          BottomBarItem(
-            inActiveItem: Icon(
-              Icons.home_filled,
-              color: Colors.blueGrey,
+    return GlobalUser.user.name.isEmpty?Update(user: GlobalUser.user,):WillPopScope(
+        onWillPop: () async {
+          final shouldExit = await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(0),
+                ),
+                title: const Text("Close the App ?"),
+                content: const Text("You sure to Close the App"),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text("Cancel"),
+                  ),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all(Colors.red),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context, true);
+                    },
+                    child: const Text(
+                      "OK",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+          return shouldExit ?? false;
+      },
+      child: Scaffold(
+        body: PageView(
+          controller: _pageController,
+          physics: const NeverScrollableScrollPhysics(),
+          children: List.generate(bottomBarPages.length, (index) => bottomBarPages[index]),
+        ),
+        extendBody: true,
+        bottomNavigationBar: (bottomBarPages.length <= maxCount)
+            ? AnimatedNotchBottomBar(
+          notchBottomBarController: _controller,
+          color: Colors.white,
+          showLabel: true,
+          textOverflow: TextOverflow.visible,
+          maxLine: 1,
+          shadowElevation: 5,
+          kBottomRadius: 28.0,
+          notchColor: Colors.black87,
+          removeMargins: false,
+          bottomBarWidth: 500,
+          showShadow: true,
+          durationInMilliSeconds: 300,
+          itemLabelStyle: const TextStyle(fontSize: 10),
+          elevation: 1,
+          bottomBarItems:  [
+            BottomBarItem(
+              inActiveItem: Icon(
+                Icons.home_filled,
+                color: Colors.blueGrey,
+              ),
+              activeItem: Icon(
+                Icons.home_filled,
+                color: Colors.blueAccent,
+              ),
+              itemLabel: 'Home',
             ),
-            activeItem: Icon(
-              Icons.home_filled,
-              color: Colors.blueAccent,
+            BottomBarItem(
+              inActiveItem: Icon(Icons.gamepad, color: Colors.blueGrey),
+              activeItem: Icon(
+                Icons.games_rounded,
+                color: Colors.blueAccent,
+              ),
+              itemLabel: 'Games',
             ),
-            itemLabel: 'Home',
-          ),
-          BottomBarItem(
-            inActiveItem: Icon(Icons.gamepad, color: Colors.blueGrey),
-            activeItem: Icon(
-              Icons.games_rounded,
-              color: Colors.blueAccent,
+            BottomBarItem(
+              inActiveItem: Icon(
+                Icons.leaderboard,
+                color: Colors.blueGrey,
+              ),
+              activeItem: Icon(
+                Icons.leaderboard,
+                color: Colors.pink,
+              ),
+              itemLabel: 'Level',
             ),
-            itemLabel: 'Games',
-          ),
-          BottomBarItem(
-            inActiveItem: Icon(
-              Icons.money_off_csred_outlined,
-              color: Colors.blueGrey,
+            BottomBarItem(
+              inActiveItem: Icon(
+                Icons.person,
+                color: Colors.blueGrey,
+              ),
+              activeItem: Icon(
+                Icons.person,
+                color: Colors.yellow,
+              ),
+              itemLabel: 'Page 4',
             ),
-            activeItem: Icon(
-              Icons.settings,
-              color: Colors.pink,
-            ),
-            itemLabel: 'Level',
-          ),
-          BottomBarItem(
-            inActiveItem: Icon(
-              Icons.person,
-              color: Colors.blueGrey,
-            ),
-            activeItem: Icon(
-              Icons.person,
-              color: Colors.yellow,
-            ),
-            itemLabel: 'Page 4',
-          ),
-        ],
-        onTap: (index) {
-          _pageController.jumpToPage(index);
-        },
-        kIconSize: 24.0,
+          ],
+          onTap: (index) {
+            _pageController.jumpToPage(index);
+          },
+          kIconSize: 24.0,
 
-      )
-          : null,
+        )
+            : null,
+      ),
     );
   }
 }

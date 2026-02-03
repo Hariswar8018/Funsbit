@@ -1,3 +1,9 @@
+import 'dart:math' show Random;
+
+import 'package:earning_app/game/crossword/firestore.dart';
+import 'package:earning_app/game/crossword/gemini.dart';
+import 'package:earning_app/global/color.dart';
+import 'package:earning_app/global/widget.dart';
 import 'package:flutter/material.dart';
 import 'package:crossword/crossword.dart';
 
@@ -14,64 +20,125 @@ class _CrosswordGameState extends State<CrosswordGamee> {
   int gameNumber = 1;
   int coins = 0;
 
-  final List<String> hints = ["FLUTTER", "GAMES", "UI", "COLORS"];
+  late  List<String> hints = [];
 
-  final List<List<String>> letters = const [
-    ["F","L","U","T","T","E","R"],
-    ["G","A","M","E","S","A","B"],
-    ["U","I","C","D","E","F","G"],
-    ["C","O","L","O","R","S","X"],
-  ];
+  late List<List<String>> letters;
 
-  final Set<String> solvedWords = {};
+  final int rows = 6;
+  final int cols = 11; // bigger grid
 
-  void onLineUpdate(String word, List<String> words, bool completed) {
+  @override
+  void initState() {
+    super.initState();
+    loadGame();
+  }
 
-    if (completed) {
+  Future<void> loadGame() async {
+    final saved = await CrosswordFirestoreService.loadGame();
+
+    if (saved != null) {
+      // ✅ ALWAYS prefer Firestore
       setState(() {
+        gameNumber = saved["gameNumber"];
+        coins = saved["coins"];
+        hints = List<String>.from(saved["hints"]);
+        solvedWords.clear();
+        solvedWords.addAll(List<String>.from(saved["solvedWords"]));
+        letters = List<List<String>>.from(
+          saved["letters"].map((r) => List<String>.from(r)),
+        );
+        attempts = solvedWords.length;
+      });
+    } else {
+      // ❌ No saved game → only now try Gemini
+      await startNewGame();
+    }
+  }
+  Future<void> saveGame() async {
+    await CrosswordFirestoreService.saveGame(
+      gameNumber: gameNumber,
+      coins: coins,
+      hints: hints,
+      letters: letters,
+      solvedWords: solvedWords,
+    );
+  }
+  void onLineUpdate(String word, List<String> words, bool completed) async {
+    if (completed && hints.contains(word) && !solvedWords.contains(word)) {
+      setState(() {
+        solvedWords.add(word);
         attempts++;
-        if (hints.contains(word)) {
-          solvedWords.add(word);
-        }
+        coins += 10;
       });
 
-      if (solvedWords.length == hints.length) {
-        redeemCoins();
-      }
+      await saveGame();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("✅ $word found! +10 coins")),
+      );
     }
   }
 
-  void redeemCoins() {
-    setState(() {
-      coins += 50;
+  Future<void> startNewGame() async {
+    List<String> words;
+
+    try {
+      words = await FirebaseCrosswordGemini.generateWords();
+    } catch (_) {
+      // 🔴 Gemini failed → use last saved words or defaults
+      words = ["FLUTTER", "GAMES", "UI", "COLORS"];
+    }
+
+    final random = Random();
+    letters = List.generate(rows, (_) {
+      return List.generate(cols, (_) {
+        return String.fromCharCode(65 + random.nextInt(26));
+      });
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("🎉 Puzzle Completed! +50 coins")),
-    );
+    setState(() {
+      hints = words;
+      solvedWords.clear();
+      attempts = 0;
+      gameNumber++;
+    });
+
+    await saveGame(); // 🔥 SAVE GENERATED DATA
   }
+
+
+  void generateGrid() {
+    final random = Random();
+
+    letters = List.generate(rows, (r) {
+      return List.generate(cols, (c) {
+        return String.fromCharCode(65 + random.nextInt(26)); // A-Z
+      });
+    });
+  }
+
+
+  final Set<String> solvedWords = {};
+
 
   void resetGame() {
     setState(() {
       attempts = 0;
       solvedWords.clear();
       gameNumber++;
+      generateGrid();
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Crossword Game"),
-        centerTitle: true,
-      ),
+      backgroundColor: GlobalColor.black,
       body: Column(
         children: [
-
+          GlobalWidget.appbar(context, "Crossword Game"),
           const SizedBox(height: 10),
-
-          /// 📊 STATS BAR
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -81,10 +148,7 @@ class _CrosswordGameState extends State<CrosswordGamee> {
               stat("Solved", "${solvedWords.length}/${hints.length}"),
             ],
           ),
-
           const SizedBox(height: 20),
-
-          /// 🧩 CROSSWORD CENTER
           Expanded(
             child: Center(
               child: Crossword(
@@ -95,12 +159,11 @@ class _CrosswordGameState extends State<CrosswordGamee> {
                 onLineUpdate: onLineUpdate,
 
                 textStyle: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
+                  color: Colors.white,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
 
-                /// ⚠ REQUIRED PARAMETER
                 lineDecoration: const LineDecoration(
                   lineGradientColors: [
                     [Colors.blue, Colors.purple],
@@ -109,7 +172,7 @@ class _CrosswordGameState extends State<CrosswordGamee> {
 
                   correctGradientColors: [Colors.green, Colors.lightGreen],
                   incorrectGradientColors: [Colors.red, Colors.orange],
-                  strokeWidth: 22,
+                  strokeWidth: 18,
 
                   lineTextStyle: TextStyle(
                     color: Colors.white,
@@ -123,29 +186,16 @@ class _CrosswordGameState extends State<CrosswordGamee> {
             ),
           ),
 
-          const SizedBox(height: 10),
 
-          /// 🎮 CONTROLS
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               ElevatedButton(
                 onPressed: resetGame,
                 child: const Text("NEW GAME"),
               ),
-
               const SizedBox(width: 20),
-
-              ElevatedButton(
-                onPressed: solvedWords.length == hints.length
-                    ? redeemCoins
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                ),
-                child: const Text("REDEEM"),
-              ),
             ],
           ),
 

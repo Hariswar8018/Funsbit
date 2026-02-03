@@ -1,46 +1,75 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flame/camera.dart' show FixedResolutionViewport;
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 
-class TetrisGame extends FlameGame with TapDetector, PanDetector {
+class TetrisGame extends FlameGame {
   final VoidCallback onWin;
 
-  static const int rows = 20;
+  static const int rows = 13;
   static const int cols = 10;
 
-  late List<List<int>> grid;
+  late List<List<Color?>> grid;
 
-  Vector2 blockSize = Vector2(25, 25);
+  Vector2 blockSize = Vector2(40, 40);
 
   double timer = 0;
 
   int score = 0;
 
   late Tetromino current;
+  final VoidCallback onGameOver;
 
-  TetrisGame({required this.onWin});
+  TetrisGame({
+    required this.onWin,
+    required this.onGameOver,
+  });
+
+  late Vector2 worldSize;
 
   @override
   Future<void> onLoad() async {
     grid = List.generate(
       rows,
-          (_) => List.generate(cols, (_) => 0),
+          (_) => List.generate(cols, (_) => null),
+    );
+
+    // ✅ Calculate exact board size
+    worldSize = Vector2(
+      cols * blockSize.x,
+      rows * blockSize.y,
+    );
+
+    // ✅ FIXED viewport to board size
+    camera.viewport = FixedResolutionViewport(
+      resolution: worldSize,
     );
 
     spawnBlock();
   }
 
+
+
+
   // Spawn new block
   void spawnBlock() {
     current = Tetromino.random();
-    current.x = cols ~/ 2;
+    current.x = (cols ~/ 2) - 1;
     current.y = 0;
+
+
+    // GAME OVER CHECK
+    if (collision(current.x, current.y)) {
+      pauseEngine();
+      onGameOver();
+    }
   }
+
   bool fastDrop = false;
 
   @override
@@ -69,32 +98,8 @@ class TetrisGame extends FlameGame with TapDetector, PanDetector {
       spawnBlock();
     }
   }
-  @override
-  void onPanUpdate(DragUpdateInfo info) {
-    final delta = info.delta.global;
 
-    // Horizontal swipe
-    if (delta.x.abs() > delta.y.abs()) {
-      if (delta.x > 5) {
-        moveRight();
-      } else if (delta.x < -5) {
-        moveLeft();
-      }
-    }
 
-    // Vertical swipe (down)
-    if (delta.y > 5) {
-      fastDrop = true;
-    }
-  }
-  @override
-  void onPanEnd(DragEndInfo info) {
-    fastDrop = false;
-  }
-  @override
-  void onTapDown(TapDownInfo info) {
-    rotate();
-  }
   void moveLeft() {
     if (!collision(current.x - 1, current.y)) {
       current.x--;
@@ -111,78 +116,136 @@ class TetrisGame extends FlameGame with TapDetector, PanDetector {
       int nx = x + p.x.toInt();
       int ny = y + p.y.toInt();
 
-
+      // wall or bottom
       if (nx < 0 || nx >= cols || ny >= rows) return true;
 
-      if (ny >= 0 && grid[ny][nx] == 1) return true;
+      // hit another block
+      if (ny >= 0 && grid[ny][nx] != null) return true;
     }
 
     return false;
   }
+
 
   void fixBlock() {
     for (var p in current.shape) {
       int x = current.x + p.x.toInt();
       int y = current.y + p.y.toInt();
 
-
-      if (y >= 0) grid[y][x] = 1;
+      if (y >= 0) {
+        grid[y][x] = current.color;
+      }
     }
   }
 
+
   void clearLines() {
     for (int i = rows - 1; i >= 0; i--) {
-      if (grid[i].every((c) => c == 1)) {
+
+      // If every cell in row is filled (not null)
+      if (grid[i].every((c) => c != null)) {
+
         grid.removeAt(i);
-        grid.insert(0, List.filled(cols, 0));
+        grid.insert(0, List.filled(cols, null));
 
         score += 100;
 
-        // Win condition
+        // WIN condition
         if (score >= 500) {
           onWin();
           pauseEngine();
         }
+
+        i++; // recheck same row after shifting
       }
     }
   }
+
+  void _drawGrid(Canvas canvas) {
+    final linePaint = Paint()
+      ..color = Colors.grey.withOpacity(0.3)
+      ..strokeWidth = 1;
+
+    for (int x = 0; x <= cols; x++) {
+      canvas.drawLine(
+        Offset(x * blockSize.x, 0),
+        Offset(x * blockSize.x, rows * blockSize.y),
+        linePaint,
+      );
+    }
+
+    for (int y = 0; y <= rows; y++) {
+      canvas.drawLine(
+        Offset(0, y * blockSize.y),
+        Offset(cols * blockSize.x, y * blockSize.y),
+        linePaint,
+      );
+    }
+  }
+
 
   @override
   void render(Canvas canvas) {
     super.render(canvas);
 
-    final paint = Paint()..color = Colors.blue;
+    // BACKGROUND
+    canvas.drawRect(
+      Rect.fromLTWH(
+        0,
+        0,
+        cols * blockSize.x,
+        rows * blockSize.y,
+      ),
+      Paint()..color = Colors.black.withOpacity(0.05),
+    );
 
-    // Draw grid
+    _drawGrid(canvas);
+
+    // Draw fixed blocks
     for (int y = 0; y < rows; y++) {
       for (int x = 0; x < cols; x++) {
-        if (grid[y][x] == 1) {
-          canvas.drawRect(
-            Rect.fromLTWH(
-              x * blockSize.x,
-              y * blockSize.y,
-              blockSize.x,
-              blockSize.y,
-            ),
-            paint,
-          );
+        final color = grid[y][x];
+        if (color != null) {
+          _drawBlock(canvas, x, y, color);
         }
       }
     }
 
     // Draw current block
     for (var p in current.shape) {
-      canvas.drawRect(
-        Rect.fromLTWH(
-          (current.x + p.x) * blockSize.x,
-          (current.y + p.y) * blockSize.y,
-          blockSize.x,
-          blockSize.y,
-        ),
-        paint,
+      _drawBlock(
+        canvas,
+        current.x + p.x.toInt(),
+        current.y + p.y.toInt(),
+        current.color,
       );
     }
   }
+  void _drawBlock(Canvas canvas, int x, int y, Color color) {
+    final rect = Rect.fromLTWH(
+      x * blockSize.x,
+      y * blockSize.y,
+      blockSize.x,
+      blockSize.y,
+    );
+
+    final paint = Paint()..color = color;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, const Radius.circular(6)),
+      paint,
+    );
+
+    // Highlight
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        rect.deflate(3),
+        const Radius.circular(4),
+      ),
+      Paint()..color = Colors.white.withOpacity(0.2),
+    );
+  }
+
   void rotate() {
     final oldShape = List<Vector2>.from(current.shape);
 
@@ -202,29 +265,26 @@ class Tetromino {
   int x = 0;
   int y = 0;
 
-  Tetromino(this.shape);
+  final Color color;
+
+  Tetromino(this.shape, this.color);
 
   static final _random = Random();
 
   static Tetromino random() {
     final shapes = [
-      // Square
       [
         Vector2(0, 0),
         Vector2(1, 0),
         Vector2(0, 1),
         Vector2(1, 1),
       ],
-
-      // Line
       [
         Vector2(0, 0),
         Vector2(1, 0),
         Vector2(2, 0),
         Vector2(3, 0),
       ],
-
-      // L
       [
         Vector2(0, 0),
         Vector2(0, 1),
@@ -233,15 +293,23 @@ class Tetromino {
       ],
     ];
 
+    final colors = [
+      Colors.red,
+      Colors.green,
+      Colors.blue,
+      Colors.orange,
+      Colors.purple,
+      Colors.cyan,
+      Colors.yellow,
+    ];
+
     return Tetromino(
       List.from(shapes[_random.nextInt(shapes.length)]),
+      colors[_random.nextInt(colors.length)],
     );
   }
 
-  // Rotate 90 degrees
   void rotate() {
-    shape = shape
-        .map((p) => Vector2(-p.y, p.x))
-        .toList();
+    shape = shape.map((p) => Vector2(-p.y, p.x)).toList();
   }
 }

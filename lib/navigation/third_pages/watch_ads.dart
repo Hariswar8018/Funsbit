@@ -3,8 +3,10 @@ import 'package:earning_app/global/color.dart';
 import 'package:earning_app/global/notify.dart';
 import 'package:earning_app/global/widget.dart';
 import 'package:earning_app/login/bloc/bloc.dart';
+import 'package:earning_app/navigation/user/service/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WatchAds extends StatefulWidget {
   const WatchAds({super.key});
@@ -21,8 +23,31 @@ class _WatchAdsState extends State<WatchAds> {
   @override
   void initState() {
     super.initState();
+    _loadDailyLimit();
     _loadRewardedAd();
   }
+  Future<void> _loadDailyLimit() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final savedDate = prefs.getString("watch_ads_date");
+    final savedCount = prefs.getInt("watch_ads_count") ?? 0;
+
+    if (savedDate != today) {
+      // 🔄 New day → reset
+      await prefs.setString("watch_ads_date", today);
+      await prefs.setInt("watch_ads_count", 0);
+
+      watchedToday = 0;
+    } else {
+      watchedToday = savedCount;
+    }
+
+    limitReached = watchedToday >= dailyLimit;
+
+    setState(() {});
+  }
+
 
   void _loadRewardedAd() {
     if (_isRewardedLoading || _rewardedAd != null) return;
@@ -105,16 +130,43 @@ class _WatchAdsState extends State<WatchAds> {
     );
   }
   Future<void> giveUserReward() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (watchedToday >= dailyLimit) {
+      Send.topic(context, "Daily Limit reached","Daily limit reached. Try again tomorrow.");
+      return;
+    }
+
     setState(() {
       progress = true;
     });
+
+    // ✅ Credit coins
+    await TransactionService.updateTransaction(
+      id: DateTime.now().toString(),
+      name: 'Watch Video Ads',
+      coins: 500,
+      status: 'Credited',
+      debit: false,
+      userId: GlobalUser.user.id,
+    );
+
     await Send.addcoins(context, 500);
-    Future.delayed(const Duration(seconds: 3), () {
+
+    // ✅ Update daily count
+    watchedToday++;
+    await prefs.setInt("watch_ads_count", watchedToday);
+
+    limitReached = watchedToday >= dailyLimit;
+
+    Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         progress = false;
       });
     });
   }
+  int dailyLimit=10,watchedToday = 0 ;
+bool limitReached = false;
 
   @override
   Widget build(BuildContext context) {
@@ -221,14 +273,14 @@ class _WatchAdsState extends State<WatchAds> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("Daily Limit",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 18),),
-                          Text("0 / 10",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 16,color: GlobalColor.black),),
+                          Text("$watchedToday / $dailyLimit",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 16,color: GlobalColor.black),),
                         ],
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 4),
                       child: LinearProgressIndicator(
-                        value: 0.5,
+                        value: watchedToday / dailyLimit,
                         minHeight: 10,
                         backgroundColor: Colors.grey.shade300,
                         color: GlobalColor.green,
@@ -240,15 +292,17 @@ class _WatchAdsState extends State<WatchAds> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 18),),
-                          Text("10 videos remaining",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 13,color: Colors.grey),),
+                          Text("${dailyLimit - watchedToday} videos remaining",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 13,color: Colors.grey),),
                         ],
                       ),
                     ),
                     Spacer(),
                     InkWell(
-                      onTap: (){
-                        showRewardedAd();
-                      },
+                      onTap: limitReached
+                          ? () {
+                        Send.topic(context, "Limit Reached","You reached today's limit (10/10)");
+                      }
+                          : showRewardedAd,
                       child: Container(
                         width: w-55,
                         height: 65,

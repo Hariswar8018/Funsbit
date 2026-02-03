@@ -1,4 +1,5 @@
 import 'package:earning_app/ads/ads_helper.dart';
+import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -134,7 +135,7 @@ class _LevelState extends State<Level> {
                   child: Icon(Icons.leaderboard,size: 50,color: Colors.white,),
                 ),
                 SizedBox(height: 10,),
-                Text("Level 1 : BASIC USER",style: TextStyle(
+                Text("Level ${GlobalUser.user.level} : BASIC USER",style: TextStyle(
                   color: Colors.white,fontWeight: FontWeight.w800,fontSize: 20
                 ),),
               ],
@@ -161,33 +162,38 @@ class _LevelState extends State<Level> {
               padding: const EdgeInsets.symmetric(horizontal: 18.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
+                children: <Widget>[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text("Total Balance",style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500),),
-                      Text("1,440",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 24,height: 1),)
+                      Text("${GlobalUser.user.balance}",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 24,height: 1),)
                     ],
                   ),
                   Spacer(),
-                  Container(
-                    width: w/2-35,height: 50,
-                    decoration: BoxDecoration(
-                      gradient:LinearGradient(
-                          colors: [Color(0xff00CB6C),Color(0xff00B990)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight
+                  InkWell(
+                    onTap: (){
+                      context.push('/withdraw');
+                    },
+                    child: Container(
+                      width: w/2-35,height: 50,
+                      decoration: BoxDecoration(
+                        gradient:LinearGradient(
+                            colors: [Color(0xff00CB6C),Color(0xff00B990)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight
+                        ),
+                        borderRadius: BorderRadius.circular(10)
                       ),
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Withdraw",style: TextStyle(fontWeight: FontWeight.w800,color: Colors.white),),
-                        SizedBox(width: 7,),
-                        Icon(Icons.payments,size: 25,color: Colors.white,)
-                      ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Withdraw",style: TextStyle(fontWeight: FontWeight.w800,color: Colors.white),),
+                          SizedBox(width: 7,),
+                          Icon(Icons.payments,size: 25,color: Colors.white,)
+                        ],
+                      ),
                     ),
                   )
                 ],

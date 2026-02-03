@@ -2,18 +2,20 @@ import 'package:earning_app/game/crossword/screen.dart';
 import 'package:earning_app/game/quiz/quiz.dart';
 import 'package:earning_app/game/spin%20the%20wheel/screen.dart';
 import 'package:earning_app/game/tetris/screen.dart';
+import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/login/getvalue.dart' show CreateUserScreen;
 import 'package:earning_app/login/login.dart';
 import 'package:earning_app/main.dart';
 import 'package:earning_app/navigation/naviagtion.dart';
 import 'package:earning_app/navigation/second_pages/about.dart';
 import 'package:earning_app/navigation/second_pages/help.dart';
-import 'package:earning_app/navigation/second_pages/history.dart';
 import 'package:earning_app/navigation/second_pages/terms.dart';
 import 'package:earning_app/navigation/second_pages/wallet.dart';
 import 'package:earning_app/navigation/second_pages/withdraw.dart';
 import 'package:earning_app/navigation/third_pages/watch_ads.dart';
 import 'package:earning_app/navigation/user/announcment.dart';
+import 'package:earning_app/navigation/user/history.dart';
+import 'package:earning_app/navigation/user/update.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -88,11 +90,15 @@ class AppRouter {
       ),
       GoRoute(
         path: '/announce',
-        builder: (context, state) => Announcment(),
+        builder: (context, state) => Announcment(my: false,),
       ),
       GoRoute(
         path: '/notify',
-        builder: (context, state) => nn.Notification(),
+        builder: (context, state) => Announcment(my: true),
+      ),
+      GoRoute(
+        path: '/update',
+        builder: (context, state) => Update(user: GlobalUser.user),
       ),
 
 

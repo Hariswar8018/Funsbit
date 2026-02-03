@@ -50,6 +50,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           lastSpin2: '',
           lastUse1: '',
           lastUse2: '',
+          referral: 0, myReferral: [], myReferralCode: '', totalDone: 0,
+
         );
 
         await ref.set(user.toMap());

@@ -1,36 +1,31 @@
 import 'dart:convert';
-import 'package:earning_app/api.dart';
+import 'package:firebase_ai/firebase_ai.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:earning_app/model/quiz.dart';
-import 'package:googleai_dart/googleai_dart.dart';
 
-class GeminiService {
-  static late final GoogleAIClient _client;
+class FirebaseGeminiService {
+  static GenerativeModel get _model {
+    final ai = FirebaseAI.googleAI(
+      auth: FirebaseAuth.instance,
+    );
 
-  GeminiService() {
-    _client = GoogleAIClient(
-      config: GoogleAIConfig.googleAI(
-        authProvider: ApiKeyProvider(Api.gemini),
-      ),
+    return ai.generativeModel(
+      model: 'gemini-2.5-flash', // ✅ latest, supported
     );
   }
 
   static Future<List<QuizQuestion>> fetchQuiz() async {
     try {
-      final response = await _client.models.generateContent(
-        model: "gemini-3-flash-preview",
-        request: GenerateContentRequest(
-          contents: [
-            Content.text(
-                """
+      final prompt = '''
 Generate exactly 10 quiz questions.
 
 Rules:
-- Each must have 4 options
+- Each question has 4 options
 - One correct answer
-- Provide correctIndex (0-3)
+- correctIndex must be 0-3
+- Return STRICT JSON ONLY (no markdown)
 
-Return STRICT JSON ONLY:
-
+Format:
 [
   {
     "question": "text",
@@ -38,27 +33,24 @@ Return STRICT JSON ONLY:
     "correctIndex": 0
   }
 ]
-"""
-            )
-          ],
-        ),
-      );
+''';
 
-      final text = response.text;
+      final response =
+      await _model.generateContent([Content.text(prompt)]);
 
-      if (text == null || text.isEmpty) {
-        throw Exception("Empty Gemini response");
-      }
+      final text = response.text?.trim();
+      if (text == null || text.isEmpty) return [];
 
-      final List decoded = jsonDecode(text);
+      final cleaned = text
+          .replaceAll('```json', '')
+          .replaceAll('```', '')
+          .trim();
 
+      final List decoded = jsonDecode(cleaned);
       return decoded.map((e) => QuizQuestion.fromMap(e)).toList();
     } catch (e) {
-      throw Exception("Gemini Quiz Generation Failed: $e");
+      print('🔥 Firebase Gemini failed: $e');
+      return [];
     }
-  }
-
-  void dispose() {
-    _client.close();
   }
 }

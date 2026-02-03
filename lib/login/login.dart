@@ -3,9 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:earning_app/global/notify.dart';
 import 'package:earning_app/login/auth.dart';
 import 'package:earning_app/model/usermodel.dart';
+import 'package:earning_app/navigation/second_pages/help.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -274,7 +276,7 @@ class _LoginState extends State<Login> {
                           fontSize: 12,fontWeight: FontWeight.w400),
                     ),),
                     SizedBox(height: 20,),
-                    c(usernameC, "Your Phone Number",Icon(Icons.email_rounded)),
+                    c(usernameC, "Your Email",Icon(Icons.email_rounded)),
                     SizedBox(height: 10,),
                     c(passwordC, "Your Password",Icon(Icons.password_sharp)),
                     SizedBox(height: 20,),
@@ -282,11 +284,9 @@ class _LoginState extends State<Login> {
                       onTap:() async {
                         try {
                           await context.read<AuthService>().login(
-                            email: email.text.trim(),
+                            email: usernameC.text.trim(),
                             password: passwordC.text.trim(),
                           );
-
-                          // 🔥 GoRouter handles redirect
                         } catch (e) {
                           Send.topic(context, "Login Failed", e.toString());
                         }
@@ -334,7 +334,28 @@ class _LoginState extends State<Login> {
                           ),),
                         ],
                       ),
-                    )
+                    ),
+                    SizedBox(height: 10,),
+                    Center(child: Text("OR"),),
+                    SizedBox(height: 5,),
+                    InkWell(
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (_)=>Help()));
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Any Questions ?",style: GoogleFonts.roboto(
+                            textStyle: const TextStyle(color: Colors.black,
+                                fontSize: 17,fontWeight: FontWeight.w600),
+                          ),),
+                          Text("Policy & Support",style: GoogleFonts.roboto(
+                            textStyle: const TextStyle(color: Colors.blue,
+                                fontSize: 17,fontWeight: FontWeight.w900),
+                          ),),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

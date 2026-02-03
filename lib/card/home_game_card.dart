@@ -6,6 +6,7 @@ import 'package:earning_app/model/game.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CardGame extends StatefulWidget {
   final Games game;
@@ -74,12 +75,24 @@ class _CardGameState extends State<CardGame> {
   }
 
 
+  Future<void> now() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final int counter = prefs.getInt('counter')??0;
+
+    if(counter%3==0){
+      showInterstitialAd();
+      await prefs.setInt('counter', counter+1);
+    }else{
+      await prefs.setInt('counter', counter+1);
+      navigate();
+    }
+  }
   @override
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: () async {
-         showInterstitialAd();
+        now();
       },
       child: Container(
         width: w/2-10,

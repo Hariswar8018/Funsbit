@@ -47,7 +47,7 @@ class Send{
         "balance":FieldValue.increment(coins),
       });
       context.read<UserBloc>().add(RefreshUserEvent());
-      Send.topic(context, "Success","Your Data is Updated",b: false);
+      Send.topic(context, "Success","Your Coins Updated",b: true);
       return "Success";
     }catch(e){
       Send.topic(context, "Error","${e}");

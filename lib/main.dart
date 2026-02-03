@@ -1,8 +1,11 @@
 import 'package:earning_app/firebase_options.dart';
+import 'package:earning_app/game/crossword/screen.dart';
 import 'package:earning_app/global/color.dart';
 import 'package:earning_app/login/auth.dart';
 import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/navigation/naviagtion.dart';
+import 'package:earning_app/navigation/second_pages/withdraw.dart';
+import 'package:earning_app/navigation/user/history.dart';
 import 'package:earning_app/router/app_router.dart' show AppRouter;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -49,6 +52,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    /*return MaterialApp(
+        title: 'FunsBit',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+        ),
+      home:Withdraw(),
+    );*/
     return MaterialApp.router(
       title: 'FunsBit',
       debugShowCheckedModeBanner: false,

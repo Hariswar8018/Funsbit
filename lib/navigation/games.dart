@@ -64,7 +64,7 @@ class _GamessState extends State<Gamess> {
                 ],
               )
           ),
-          SizedBox(height: 25,),
+          SizedBox(height: 10,),
           Container(
               height: w/2-10,
               child: Row(
