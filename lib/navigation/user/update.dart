@@ -7,8 +7,10 @@ import 'package:earning_app/global/widget.dart';
 import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/login/bloc/userevent.dart';
 import 'package:earning_app/model/usermodel.dart';
+import 'package:earning_app/navigation/naviagtion.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -85,13 +87,13 @@ class _UserProfileState extends State<Update> {
                 SizedBox(height: 20,),
                 c(name, "Your Name",Icon(Icons.person)),
                 SizedBox(height: 10,),
-                c(emails, "Your Email",Icon(Icons.email)),
+                c(emails, "Your Email",Icon(Icons.email),readonly: true),
                 SizedBox(height: 10,),
-                c(phone, "Your Phone Number",Icon(Icons.phone_android)),
+                c(phone, "Your Phone Number",Icon(Icons.phone_android),number: true),
                 SizedBox(height: 10,),
-                c(age, "Your Age ( Optional - min 18 )",Icon(Icons.phone_android)),
+                c(age, "Your Age ( Optional - min 18 )",Icon(Icons.phone_android),number: true),
                 SizedBox(height: 20,),
-                InkWell(
+                progress?Center(child: CircularProgressIndicator()):InkWell(
                   onTap: () async {
                     try {
                       change(true);
@@ -102,8 +104,18 @@ class _UserProfileState extends State<Update> {
                         "phone":phone.text.trim(),
                       });
                       context.read<UserBloc>().add(RefreshUserEvent());
-                      change(false);
-                      Send.topic(context, "Success","Your Data is Updated",b: false);
+
+                      if((widget.isback)){
+                        change(false);
+                        Navigator.pop(context);
+                        Send.topic(context, "Success","Your Data is Updated",b: false);
+                      }else{
+                        Future.delayed(const Duration(seconds: 3), () {
+                          change(false);
+                          if (!mounted) return;
+                          context.push("/home");
+                        });
+                      }
                     }catch(e){
                       change(false);
                       Send.topic(context, "Error","${e}");
@@ -146,15 +158,20 @@ class _UserProfileState extends State<Update> {
   }
   bool progress= false;
   void change(bool th){
-    progress = th;
+    setState(() {
+      progress = th;
+
+    });
   }
-  Widget c(TextEditingController c, String str, Widget icon){
+  Widget c(TextEditingController c, String str, Widget icon,{bool readonly = false, bool number = false}){
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: TextField(
         controller: c,
+        keyboardType:!number?TextInputType.text: TextInputType.number,
         style: const TextStyle(color: Colors.black),
         cursorColor: Colors.black,
+        readOnly: readonly,
         decoration:  InputDecoration(
           hintText: str,
           prefixIcon: icon,

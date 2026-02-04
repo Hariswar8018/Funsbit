@@ -1,5 +1,6 @@
 import 'package:earning_app/firebase_options.dart';
-import 'package:earning_app/game/crossword/screen.dart';
+import 'package:earning_app/game/crossword/game.dart';
+
 import 'package:earning_app/global/color.dart';
 import 'package:earning_app/login/auth.dart';
 import 'package:earning_app/login/bloc/bloc.dart';
@@ -58,7 +59,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         ),
-      home:Withdraw(),
+      home:CustomCrossword(),
     );*/
     return MaterialApp.router(
       title: 'FunsBit',

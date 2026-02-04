@@ -1,4 +1,4 @@
-import 'package:earning_app/game/crossword/screen.dart';
+import 'package:earning_app/game/crossword/game.dart';
 import 'package:earning_app/game/quiz/quiz.dart';
 import 'package:earning_app/game/spin%20the%20wheel/screen.dart';
 import 'package:earning_app/game/tetris/screen.dart';
@@ -6,6 +6,7 @@ import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/login/getvalue.dart' show CreateUserScreen;
 import 'package:earning_app/login/login.dart';
 import 'package:earning_app/main.dart';
+import 'package:earning_app/navigation/daily_reward/screen.dart';
 import 'package:earning_app/navigation/naviagtion.dart';
 import 'package:earning_app/navigation/second_pages/about.dart';
 import 'package:earning_app/navigation/second_pages/help.dart';
@@ -98,7 +99,7 @@ class AppRouter {
       ),
       GoRoute(
         path: '/update',
-        builder: (context, state) => Update(user: GlobalUser.user),
+        builder: (context, state) => Update(user: GlobalUser.user,isback: true,),
       ),
 
 
@@ -108,6 +109,10 @@ class AppRouter {
 
 
       //Second Pages
+      GoRoute(
+        path: '/dailywin',
+        builder: (context, state) => DailyWinScreen(),
+      ),
       GoRoute(
         path: '/wallet',
         builder: (context, state) => Wallet(),
@@ -141,7 +146,7 @@ class AppRouter {
       ),
       GoRoute(
         path: '/crossword',
-        builder: (context, state) =>CrosswordGamee(),
+        builder: (context, state) =>CustomCrossword(),
       ),
       GoRoute(
         path: '/tetris',

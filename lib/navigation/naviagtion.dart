@@ -45,7 +45,7 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
       Level(),
       Profile(),
     ];
-    return GlobalUser.user.name.isEmpty?Update(user: GlobalUser.user,):WillPopScope(
+    return GlobalUser.user.name.isEmpty?Update(user: GlobalUser.user,isback: false,):WillPopScope(
         onWillPop: () async {
           final shouldExit = await showDialog<bool>(
             context: context,

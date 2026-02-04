@@ -93,7 +93,40 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
-            SizedBox(height: 25,),
+            SizedBox(height: 15,),
+            InkWell(
+              onTap: (){
+                context.push("/dailywin");
+              },
+              child: Container(
+                width: w-30,
+                height: 65,
+                decoration: BoxDecoration(
+                  color: Colors.yellow.shade50,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: Row(
+                    children: [
+                      Image.asset("assets/daily.png",height: 45,),
+                      SizedBox(width: 8,),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Daily Rewards",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 15,height: 1),),
+                          Text("Claim Your Daily Reward",style: TextStyle(        height: 1, fontSize: 13,color: Colors.grey.shade700),),
+                        ],
+                      ),
+                      Spacer(),
+                      Icon(Icons.arrow_forward),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10,),
             Container(
               width: w-30,height: 160,
               decoration: BoxDecoration(
@@ -101,7 +134,6 @@ class _HomeState extends State<Home> {
                   color: Colors.grey.shade300,
                   width: 3.5
                 ),
-        
                 borderRadius: BorderRadius.circular(25)
               ),
               child: Padding(
@@ -118,9 +150,16 @@ class _HomeState extends State<Home> {
                                 fontSize: 13,fontWeight: FontWeight.w600,
                               color: Colors.grey
                             ),),
-                            Text("${GlobalUser.user.balance}",style: TextStyle(
-                                fontSize: 20,fontWeight: FontWeight.w900
-                            ),),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset("assets/gold.png",height: 22,),
+                                SizedBox(width: 7,),
+                                Text("${GlobalUser.user.balance}",style: TextStyle(
+                                    fontSize: 20,fontWeight: FontWeight.w900
+                                ),),
+                              ],
+                            ),
                           ],
                         ),
                         Container(
@@ -137,9 +176,16 @@ class _HomeState extends State<Home> {
                                 fontSize: 13,fontWeight: FontWeight.w600,
                                 color: Colors.grey
                             ),),
-                            Text("Lvl. ${GlobalUser.user.level}",style: TextStyle(
-                                fontSize: 20,fontWeight: FontWeight.w900
-                            ),),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset("assets/level.png",height: 22,),
+                                SizedBox(width: 7,),
+                                Text("Lvl. ${GlobalUser.user.level}",style: TextStyle(
+                                    fontSize: 20,fontWeight: FontWeight.w900
+                                ),),
+                              ],
+                            ),
                           ],
                         ),
                       ],
@@ -219,7 +265,7 @@ class _HomeState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     CardGame(game: games[2]),
-                    CardGame(game: games[3]),
+                    SizedBox(width: w/2-15,)
                   ],
                 )
             ),

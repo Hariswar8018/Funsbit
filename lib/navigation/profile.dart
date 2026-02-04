@@ -1,4 +1,5 @@
 import 'package:earning_app/global/color.dart';
+import 'package:earning_app/global/widget.dart';
 import 'package:earning_app/login/auth.dart';
 import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/main.dart';
@@ -150,6 +151,9 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
+            SizedBox(height: 10,),
+            GlobalWidget.follow(w),
+            SizedBox(height: 10,),
             InkWell(
               onTap: (){
                 context.push("/wallet");

@@ -71,7 +71,7 @@ class _GamessState extends State<Gamess> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   CardGame(game: games[2]),
-                  CardGame(game: games[3]),
+                  SizedBox(width: w/2-10,)
                 ],
               )
           ),

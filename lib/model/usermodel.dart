@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserModel {
   final String id;
   final String name;
@@ -28,8 +30,12 @@ class UserModel {
   final List<String> myReferral;
   final String myReferralCode;
   final int totalDone;
+  final DateTime? lastDailyClaim;
+  final int dailyStreak;
 
   UserModel({
+    required this.dailyStreak,
+    required this.lastDailyClaim,
     required this.id,
     required this.name,
     required this.password,
@@ -60,6 +66,9 @@ class UserModel {
     return {
       'id': id,
       'name': name,
+      'dailyStreak': dailyStreak,
+      'lastDailyClaim': lastDailyClaim,
+
       'password': password,
       'phone': phone,
       'email': email,
@@ -87,6 +96,12 @@ class UserModel {
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
+      lastDailyClaim: map['lastDailyClaim'] != null
+          ? (map['lastDailyClaim'] as Timestamp).toDate()
+          : null,
+
+      dailyStreak:
+      int.tryParse(map['dailyStreak']?.toString() ?? '0') ?? 0,
       id: map['id'] ?? '',
       name: map['name'] ?? '',
       password: map['password'] ?? '',
@@ -101,6 +116,7 @@ class UserModel {
       withdrawalBalance:
       int.tryParse(map['withdrawalBalance']?.toString() ?? '0') ?? 0,
       level: map['level'] ?? '1',
+
       totalTaps:
       int.tryParse(map['totalTaps']?.toString() ?? '0') ?? 0,
       totalAdsSeen:

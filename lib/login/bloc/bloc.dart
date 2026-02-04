@@ -51,6 +51,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           lastUse1: '',
           lastUse2: '',
           referral: 0, myReferral: [], myReferralCode: '', totalDone: 0,
+          dailyStreak: 0, lastDailyClaim: DateTime.now().subtract(Duration(days: 1)).toUtc(),
 
         );
 
