@@ -14,6 +14,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../navigation/home.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 
+bool admin =
+    GlobalUser.user.email == "satyabratam433@gmail.com" ||
+        GlobalUser.user.email == "samasasahi14@gmail.com";
 
 class MyNavigationPage extends StatefulWidget {
   const MyNavigationPage({Key? key}) : super(key: key);
@@ -181,7 +184,6 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
 
     super.dispose();
   }
-  bool b = GlobalUser.user.email=="samasiharisw@gmail.com";
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +193,7 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
       Level(),
       Profile(),
     ];
-    return b?NavigationAdmin():GlobalUser.user.name.isEmpty?Update(user: GlobalUser.user,isback: false,):WillPopScope(
+    return admin?NavigationAdmin():GlobalUser.user.name.isEmpty?Update(user: GlobalUser.user,isback: false,):WillPopScope(
         onWillPop: () async {
           final shouldExit = await showDialog<bool>(
             context: context,

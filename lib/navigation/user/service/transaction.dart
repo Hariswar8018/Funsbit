@@ -10,7 +10,7 @@ class TransactionService {
    Stream<List<TransactionModel>> getTransactions(String id) {
     return _firestore
         .collection(collection)
-        .where("userId",isEqualTo: id)
+        .where("userId",isEqualTo: id).orderBy("time",descending: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -27,6 +27,9 @@ class TransactionService {
     required bool debit,
     required String userId,
     String info = '',
+    String upi = '',
+    String bankinfc = '',
+    String bankno = '',
   }) async {
     final data = TransactionModel(
       id: id,
@@ -37,6 +40,10 @@ class TransactionService {
       status: status,
       userId: userId,
       info: info,
+      upiNumber: upi,
+      bankIfsc: bankinfc,
+      bankNumber: bankno,
+
     );
 
     await _firestore

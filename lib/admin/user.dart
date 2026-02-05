@@ -253,11 +253,8 @@ class UserDetailPage extends StatelessWidget {
                     children:[
                       row('Phone', user.phone),
                       row('Withdrawal', user.withdrawalBalance.toString()),
-                      row('Total Taps', user.totalTaps.toString()),
-                      row('Ads Seen', user.totalAdsSeen.toString()),
                       row('Referral Count', user.referral.toString()),
                       row('Referral Code', user.myReferralCode),
-                      row('Total Done', user.totalDone.toString()),
                       row('Daily Streak', user.dailyStreak.toString()),
                       const SizedBox(height: 12),
                       /*const Text(

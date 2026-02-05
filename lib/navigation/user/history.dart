@@ -32,6 +32,7 @@ class _HistoryState extends State<History> {
                   );
                 }
                 if (snapshot.hasError) {
+                  print(snapshot.error);
                   return Center(
                     child: Text("Error: ${snapshot.error}"),
                   );
