@@ -104,8 +104,6 @@ class _LevelState extends State<Level> {
                   SizedBox(width: 8,),
                   Spacer(),
                   tabcircle(Icon(Icons.notifications_active_rounded),"notify"),
-                  SizedBox(width: 6,),
-                  tabcircle(Icon(Icons.add_reaction_sharp),"announce"),
                   SizedBox(width: 8,),
                 ],
               ),

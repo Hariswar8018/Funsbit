@@ -2,6 +2,7 @@
 
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:earning_app/card/transaction_card.dart';
 import 'package:earning_app/global/widget.dart';
 import 'package:earning_app/model/transaction.dart';
 import 'package:flutter/material.dart';
@@ -20,39 +21,41 @@ class _TransactionsState extends State<Transactions> {
     return Scaffold(
       body: Column(
         children: [
-          GlobalWidget.appbar(context, "All Transactions"),
-          /*Flexible(
-            child:StreamBuilder(
-              stream: FirebaseFirestore.instance.collection("transactions").doc().snapshots(),
+          GlobalWidget.appbar(context, !widget.completed?"All Transactions":"Pending Payments"),
+          Flexible(
+            child:StreamBuilder<QuerySnapshot>(
+              stream: !widget.completed ? FirebaseFirestore.instance
+                  .collection("transactions").orderBy("time")
+                  .snapshots():FirebaseFirestore.instance
+                  .collection("transactions")
+                  .where('status', isEqualTo: 'Waiting for Admin Approval')
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text("Error: ${snapshot.error}"),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
-                // Empty
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text("No Transactions Found"),
-                  );
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
                 }
-                final transactions = snapshot.data!;
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text("No Transactions Found"));
+                }
+
+                final transactions = snapshot.data!.docs;
+
                 return ListView.builder(
                   itemCount: transactions.length,
                   itemBuilder: (context, index) {
-                    final tx = transactions[index];
-                    return TransactionCard(tx: tx,);
+                    final data = transactions[index].data() as Map<String, dynamic>;
+                    final tx = TransactionModel.fromJson(data);
+                    return TransactionCard(tx: tx);
                   },
                 );
               },
             ),
-          )*/
+          )
         ],
       ),
     );

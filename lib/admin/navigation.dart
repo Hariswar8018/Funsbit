@@ -2,8 +2,12 @@
 
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:earning_app/card/transaction_card.dart';
 import 'package:earning_app/global/widget.dart';
+import 'package:earning_app/login/auth.dart';
+import 'package:earning_app/model/transaction.dart' show TransactionModel;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class NavigationAdmin extends StatefulWidget {
@@ -71,10 +75,47 @@ class _NavigationAdminState extends State<NavigationAdmin> {
   Widget build(BuildContext context) {
     double w = MediaQuery.of(context).size.width;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Text("Admin Panel",style: TextStyle(fontWeight: FontWeight.w900,color: Colors.white),),
+        actions: [
+          IconButton(onPressed: (){
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0), // Rectangle (no rounded edges)
+                  ),
+                  title: const Text("Log out ?"),
+                  content: const Text("You sure to Log out from the App"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false), // Cancel
+                      child: const Text("Cancel"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        await context.read<AuthService>().logout();
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.resolveWith(
+                              (states) => Colors.red,   // your color here
+                        ),
+                      ),
+                      child: const Text("OK",style: TextStyle(color: Colors.white)),
+                    )
+                  ],
+                );
+              },
+            );
+          }, icon: Icon(Icons.logout,color: Colors.red,))
+        ],
+      ),
       body: Column(
         children: [
-          GlobalWidget.appbar(context, "Admin Panel"),
-          SizedBox(height: 10,),
+          SizedBox(height: 15,),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -104,7 +145,43 @@ class _NavigationAdminState extends State<NavigationAdmin> {
                 Text("Send Notifications to Users",style: TextStyle(fontWeight: FontWeight.w900,color: Colors.white),)
               ],),
             ),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Flexible(
+            child:StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection("transactions")
+                  .where('status', isEqualTo: 'Waiting for Admin Approval')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text("No Transactions Found"));
+                }
+
+                final transactions = snapshot.data!.docs;
+
+                return ListView.builder(
+                  itemCount: transactions.length,
+                  itemBuilder: (context, index) {
+                    final data = transactions[index].data() as Map<String, dynamic>;
+                    final tx = TransactionModel.fromJson(data);
+                    return TransactionCard(tx: tx);
+                  },
+                );
+              },
+            ),
           )
+
         ],
       ),
     );

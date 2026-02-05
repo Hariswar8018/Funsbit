@@ -1,6 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:earning_app/admin/send_notification.dart';
 import 'package:earning_app/global/notify.dart';
 import 'package:earning_app/global/widget.dart';
+import 'package:earning_app/login/bloc/bloc.dart';
+import 'package:earning_app/login/bloc/userevent.dart';
+import 'package:earning_app/navigation/user/service/transaction.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Withdraw extends StatefulWidget {
   Withdraw({super.key});
@@ -45,7 +52,7 @@ class _WithdrawState extends State<Withdraw> {
                       children: [
                         Image.asset("assets/gold.png",width: 24,),
                         SizedBox(width: 5,),
-                        Text("1,550",style: TextStyle(height:1,fontSize: 28,fontWeight: FontWeight.w900),)
+                        Text("${GlobalUser.user.balance}",style: TextStyle(height:1,fontSize: 28,fontWeight: FontWeight.w900),)
                       ],
                     ),
                   ),
@@ -80,7 +87,7 @@ class _WithdrawState extends State<Withdraw> {
                     SizedBox(height: 14,),
                     Text("Total Coins",
                       style: TextStyle(height:1,fontSize: 18,fontWeight: FontWeight.w800),),
-                    c(coins, "Total Coins to Withdraw", Icon(Icons.diamond_outlined)),
+                    c(coins, "Total Coins to Withdraw", Icon(Icons.diamond_outlined),str8: "hsxbnx"),
                     SizedBox(height: 14,),
                     Text("Withdraw Method : ",
                       style: TextStyle(height:1,fontSize: 18,fontWeight: FontWeight.w800),),
@@ -94,17 +101,65 @@ class _WithdrawState extends State<Withdraw> {
                     SizedBox(height: 14,),
                     Text(upi?"Your UPI Details":"Your Bank Account Number",
                       style: TextStyle(height:1,fontSize: 18,fontWeight: FontWeight.w800),),
-                    upi?c(upinum, "8093426959@paytm", Icon(Icons.diamond_outlined)):
-                    c(upinum2, "5544567534790", Icon(Icons.diamond_outlined)),
+                    upi?c(upinum, "8093426959@paytm", Icon(Icons.alternate_email)):
+                    c(upinum2, "5544567534790", Icon(Icons.numbers)),
                     upi?SizedBox():SizedBox(height: 14,),
                     upi?SizedBox():Text("IFSC CODE",
                       style: TextStyle(height:1,fontSize: 18,fontWeight: FontWeight.w800),),
-                    upi?SizedBox():c(upinum, "KKBK009574", Icon(Icons.diamond_outlined)),
+                    upi?SizedBox():c(ifsc, "KKBK009574", Icon(Icons.confirmation_num)),
                     SizedBox(height: 14,),
                     SizedBox(height: 20,),
-                    InkWell(
-                      onTap: (){
-                        Send.topic(context, "Not Enough Balance","Minimum Withdraw is 5,000 Coins for 100 INR. Come back later");
+                    progress?Center(child: CircularProgressIndicator()):InkWell(
+                      onTap: () async {
+                        int i = int.parse(coins.text);
+                        if(i>GlobalUser.user.balance){
+                          Send.topic(context, "Not Enough Balance","You don't have Enough Balance to redeem. You have only ${GlobalUser.user.balance} Coins");
+                          return ;
+                        }
+                        if(i<=20000){
+                          Send.topic(context, "Minimum Withdrawal 100 INR","Minimum Withdraw is 200,000 Coins for 100 INR. Come back later");
+                          return ;
+                        }
+                        if(upi && upinum.text.isEmpty){
+                          Send.topic(context, "Fill your UPI Number","Fill your UPI Number to Proceed");
+                          return ;
+                        }else if( !upi && (upinum2.text.isEmpty || ifsc.text.isEmpty)){
+                          Send.topic(context, "Fill your Details","Fill your Bank Number and IFSC to Proceed");
+                          return ;
+
+                        }
+                        await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(0),
+                              ),
+                              title: const Text("Confirm to Withdrawal"),
+                              content: const Text("Make Sure to check all details again ! Payments will be carried out in this Account only"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text("Cancel"),
+                                ),
+                                ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(Colors.red),
+                                  ),
+                                  onPressed: () async {
+                                    Navigator.pop(context, true);
+                                    startprocess(i);
+                                  },
+                                  child: const Text(
+                                    "OK",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
                       },
                       child: Container(
                         width: MediaQuery.of(context).size.width - 20,
@@ -126,7 +181,7 @@ class _WithdrawState extends State<Withdraw> {
                             Icon(Icons.payment,color: Colors.black,),
                             SizedBox(width: 8),
                             Text(
-                              "Request Gift Card",
+                              "Request Withdrawl",
                               style: TextStyle(fontWeight: FontWeight.w700,color: Colors.black),
                             ),
                           ],
@@ -147,8 +202,50 @@ class _WithdrawState extends State<Withdraw> {
       ),
     );
   }
+  Future<void> startprocess(int i) async {
+    togglee(true);
+    try {
+      await FirebaseFirestore.instance.collection("users")
+          .doc(FirebaseAuth.instance.currentUser!.uid).update({
+        "balance": FieldValue.increment(-i),
+      });
+      context.read<UserBloc>().add(RefreshUserEvent());
+      await TransactionService.updateTransaction(
+        id: DateTime.now().toString(),
+        name: 'Withdraw ${i / 2000} INR for $i Coins',
+        coins: i,
+        status: 'Waiting for Admin Approval',
+        debit: true,
+        userId: GlobalUser.user.id,
+        upi: upinum.text,
+        bankno: upinum2.text,
+        bankinfc: ifsc.text,
+      );
+      togglee(false);
+
+      Send.topic(
+          context, "Success", "Your Withdrawl Request is Proceed", b: true);
+      await NotifyAll.sendNotificationsCompany(
+          "🎉 Congrats Your Redeem $i Coins",
+          "Your Withdrawal ${stsr()} will be processed within 2-3 Business Days ",
+          [GlobalUser.user.tokens]);
+    }catch(e){
+      togglee(true);
+      Send.topic(
+          context, "Error", "$e", b: true);
+    }
+  }
+  void togglee(bool y){
+    setState(() {
+      progress = y;
+    });
+  }
+  bool progress = false;
+
   TextEditingController upinum = TextEditingController();
   TextEditingController upinum2 = TextEditingController();
+  TextEditingController ifsc = TextEditingController();
+
   Widget card(double w , bool toggles )=>InkWell(
     onTap: toggle,
     child: Container(
@@ -175,7 +272,7 @@ class _WithdrawState extends State<Withdraw> {
 
   TextEditingController coins = TextEditingController();
 
-  Widget c(TextEditingController c, String str, Widget icon,{bool number = false}){
+  Widget c(TextEditingController c, String str, Widget icon,{bool number = false, String str8=""}){
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: TextField(
@@ -186,6 +283,7 @@ class _WithdrawState extends State<Withdraw> {
         decoration:  InputDecoration(
           hintText: str,
           prefixIcon: icon,
+          suffix: str8.isEmpty?SizedBox():Text(stsr()),
           labelStyle: TextStyle(color: Colors.black),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.black),
@@ -199,5 +297,13 @@ class _WithdrawState extends State<Withdraw> {
         ),
       ),
     );
+  }
+  String stsr(){
+    try {
+      int y = int.parse(coins.text);
+      return (y / 2000).toStringAsFixed(0)+"₹ ";
+    }catch(e){
+      return "";
+    }
   }
 }

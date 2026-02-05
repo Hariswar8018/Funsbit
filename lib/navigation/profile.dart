@@ -8,6 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -152,7 +153,6 @@ class _ProfileState extends State<Profile> {
               ),
             ),
             SizedBox(height: 10,),
-            GlobalWidget.follow(w),
             SizedBox(height: 10,),
             InkWell(
               onTap: (){
@@ -253,12 +253,65 @@ class _ProfileState extends State<Profile> {
                 ],
               ),
             ),
+            SizedBox(height: 30,),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Social Accounts",style: TextStyle(fontWeight: FontWeight.w900,fontSize: 18),),
+                ],
+              ),
+            ),
+            SizedBox(height: 10,),
+            Container(
+              width: w-25,
+              height: (220)*(2/3),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4), // shadow downwards
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  list2("assets/Telegram_2019_Logo.svg.png", "Telegram Channel", "https://t.me/+6y6Lnkhk13E3NzE1"),
+                  list2("assets/instagram.webp", "Instagram Channel", "https://www.instagram.com/funs.bit/"),
+                ],
+              ),
+            ),
             SizedBox(height: 130,),
           ],
         ),
       ),
     );
   }
+  Widget list2(String assets, String str, String navigate)=>ListTile(
+    onTap: () async {
+      final Uri _url = Uri.parse(navigate);
+      if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+      }
+    },
+    leading: Container(
+        decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(10)
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Image.asset(assets),
+        )),
+    title: Text(str,style: TextStyle(fontWeight: FontWeight.w700),),
+    trailing: Icon(Icons.arrow_forward,color: Colors.grey,),
+  );
+
 
   Widget list(Widget icon, String str, String navigate)=>ListTile(
     onTap: (){
