@@ -7,10 +7,10 @@ class TransactionService {
 
   static final String collection = "transactions";
 
-   Stream<List<TransactionModel>> getTransactions() {
+   Stream<List<TransactionModel>> getTransactions(String id) {
     return _firestore
         .collection(collection)
-        .where("userId",isEqualTo: GlobalUser.user.id)
+        .where("userId",isEqualTo: id)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {

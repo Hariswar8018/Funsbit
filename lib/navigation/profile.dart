@@ -83,7 +83,7 @@ class _ProfileState extends State<Profile> {
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 12.0,vertical: 4),
-                                        child: Text("🏆 Miner Level ${GlobalUser.user.level}"
+                                        child: Text("🏆 App Level ${GlobalUser.user.level}"
                                           ,style: TextStyle(color: Colors.orange,fontWeight: FontWeight.w900, fontSize: 11),),
                                       ),
                                     )

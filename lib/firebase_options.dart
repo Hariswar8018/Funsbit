@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAXxtU_eVkyX8Z2aLrhXB-vAIYeXXzeroo',
-    appId: '1:930069007672:android:d765a09d5864728c5285cd',
+    appId: '1:930069007672:android:c06eb07840736b275285cd',
     messagingSenderId: '930069007672',
     projectId: 'funsbit',
     storageBucket: 'funsbit.firebasestorage.app',
@@ -63,6 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '930069007672',
     projectId: 'funsbit',
     storageBucket: 'funsbit.firebasestorage.app',
+    androidClientId: '930069007672-2uh85b9nc4ebjr36gsblbprsbmefu6t3.apps.googleusercontent.com',
     iosClientId: '930069007672-q72ufhukaa0ercfb76lh3n1botaod4vh.apps.googleusercontent.com',
     iosBundleId: 'com.starwish.funsbit',
   );

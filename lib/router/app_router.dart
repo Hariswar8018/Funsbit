@@ -1,3 +1,7 @@
+import 'package:earning_app/admin/navigation.dart';
+import 'package:earning_app/admin/send_notification.dart';
+import 'package:earning_app/admin/transactions.dart';
+import 'package:earning_app/admin/user.dart';
 import 'package:earning_app/game/crossword/game.dart';
 import 'package:earning_app/game/quiz/quiz.dart';
 import 'package:earning_app/game/spin%20the%20wheel/screen.dart';
@@ -83,7 +87,7 @@ class AppRouter {
       ),
       GoRoute(
         path: '/history',
-        builder: (context, state) => History(),
+        builder: (context, state) => History(id: GlobalUser.user.id,),
       ),
       GoRoute(
         path: '/refer',
@@ -103,7 +107,22 @@ class AppRouter {
       ),
 
 
-
+      GoRoute(
+        path: '/users',
+        builder: (context, state) => Users(),
+      ),
+      GoRoute(
+        path: '/transactions',
+        builder: (context, state) => Transactions(completed: false),
+      ),
+      GoRoute(
+        path: '/alltransactions',
+        builder: (context, state) => Transactions(completed: true),
+      ),
+      GoRoute(
+        path: '/admin',
+        builder: (context, state) => NavigationAdmin(),
+      ),
 
 
 
@@ -151,6 +170,10 @@ class AppRouter {
       GoRoute(
         path: '/tetris',
         builder: (context, state) => TetrisScreen(),
+      ),
+      GoRoute(
+        path: '/send',
+        builder: (context, state) => NotifyAllUsersPage(),
       ),
     ],
   );

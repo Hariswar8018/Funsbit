@@ -7,7 +7,7 @@ class AdHelper {
   // =========================
   // false = Test Ads
   // true  = Real Ads
-  static bool isTest = true;
+  static bool isTest = false;
 
 
   // Banner

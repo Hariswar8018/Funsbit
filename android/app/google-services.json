@@ -7,9 +7,89 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:930069007672:android:b40a21f4185319345285cd",
+        "android_client_info": {
+          "package_name": "com.starwish.funbits"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "930069007672-104g2k7l5jeebi9q87o53fsff548ohlg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXxtU_eVkyX8Z2aLrhXB-vAIYeXXzeroo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "930069007672-104g2k7l5jeebi9q87o53fsff548ohlg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "930069007672-q72ufhukaa0ercfb76lh3n1botaod4vh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.starwish.funsbit"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:930069007672:android:d765a09d5864728c5285cd",
         "android_client_info": {
           "package_name": "com.starwish.funsbit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "930069007672-2uh85b9nc4ebjr36gsblbprsbmefu6t3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.starwish.funsbit",
+            "certificate_hash": "78a4e1e68646471407c1ce6667b7a40a4695be2a"
+          }
+        },
+        {
+          "client_id": "930069007672-104g2k7l5jeebi9q87o53fsff548ohlg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXxtU_eVkyX8Z2aLrhXB-vAIYeXXzeroo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "930069007672-104g2k7l5jeebi9q87o53fsff548ohlg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "930069007672-q72ufhukaa0ercfb76lh3n1botaod4vh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.starwish.funsbit"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:930069007672:android:c06eb07840736b275285cd",
+        "android_client_info": {
+          "package_name": "com.starwish.zook"
         }
       },
       "oauth_client": [

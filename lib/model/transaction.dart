@@ -10,6 +10,11 @@ class TransactionModel {
   final String userId;
   final String info;
 
+  // NEW FIELDS
+  final String upiNumber;
+  final String bankNumber;
+  final String bankIfsc;
+
   TransactionModel({
     required this.id,
     required this.debit,
@@ -19,9 +24,14 @@ class TransactionModel {
     required this.status,
     required this.userId,
     required this.info,
+
+    // NEW
+    this.upiNumber = '',
+    this.bankNumber = '',
+    this.bankIfsc = '',
   });
 
-  // Convert to JSON (for Firestore)
+  /// Convert to JSON (Firestore)
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -32,10 +42,14 @@ class TransactionModel {
       'status': status,
       'userId': userId,
       'info': info,
+
+      // NEW
+      'upiNumber': upiNumber,
+      'bankNumber': bankNumber,
+      'bankIfsc': bankIfsc,
     };
   }
 
-  // Convert from JSON (from Firestore)
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
     return TransactionModel(
       id: json['id'] ?? '',
@@ -46,6 +60,9 @@ class TransactionModel {
       status: json['status'] ?? '',
       userId: json['userId'] ?? '',
       info: json['info'] ?? '',
+      upiNumber: json['upiNumber'] ?? '',
+      bankNumber: json['bankNumber'] ?? '',
+      bankIfsc: json['bankIfsc'] ?? '',
     );
   }
 }

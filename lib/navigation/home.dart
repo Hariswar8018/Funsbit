@@ -4,6 +4,9 @@ import 'package:earning_app/ads/ads_helper.dart';
 import 'package:earning_app/global/color.dart';
 import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/model/game.dart';
+import 'package:earning_app/navigation/user/notifications/save_token.dart';
+import 'package:earning_app/navigation/user/notifications/show_notification.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:earning_app/card/home_game_card.dart';
 import 'package:go_router/go_router.dart';
@@ -26,10 +29,11 @@ class _HomeState extends State<Home> {
     super.dispose();
   }
 
+
+
   @override
   void initState() {
     super.initState();
-
     _bannerAd = BannerAd(
       adUnitId: AdHelper.getBanner(0),
       size: AdSize.banner,

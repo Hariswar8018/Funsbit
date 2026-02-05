@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/login/bloc/userevent.dart' show RefreshUserEvent;
+import 'package:earning_app/navigation/user/notifications/notify_all_function.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
@@ -48,6 +49,8 @@ class Send{
       });
       context.read<UserBloc>().add(RefreshUserEvent());
       Send.topic(context, "Success","Your Coins Updated",b: true);
+      await NotifyAllFunction.sendNotificationToUser(GlobalUser.user.id,"🎉 Congrats on Winning $coins Coins", "You win $int coins ! It is Added to your Balance ");
+      await NotifyAllFunction.sendNotificationToToken("🎉 Congrats on Winning $coins Coins", "You win $int coins ! It is Added to your Balance ", GlobalUser.user.tokens);
       return "Success";
     }catch(e){
       Send.topic(context, "Error","${e}");

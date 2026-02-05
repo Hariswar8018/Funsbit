@@ -70,7 +70,7 @@ class _WalletState extends State<Wallet> {
           SizedBox(height: 20,),
           Flexible(
             child: StreamBuilder<List<TransactionModel>>(
-              stream: service.getTransactions(),
+              stream: service.getTransactions(GlobalUser.user.id),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
@@ -82,8 +82,6 @@ class _WalletState extends State<Wallet> {
                     child: Text("Error: ${snapshot.error}"),
                   );
                 }
-
-                // Empty
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(
                     child: Text("No Transactions Found"),

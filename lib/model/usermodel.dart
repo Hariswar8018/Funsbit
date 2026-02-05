@@ -32,8 +32,10 @@ class UserModel {
   final int totalDone;
   final DateTime? lastDailyClaim;
   final int dailyStreak;
+  final String tokens;
 
   UserModel({
+    required this.tokens,
     required this.dailyStreak,
     required this.lastDailyClaim,
     required this.id,
@@ -64,6 +66,7 @@ class UserModel {
 
   Map<String, dynamic> toMap() {
     return {
+      'fcmToken':tokens,
       'id': id,
       'name': name,
       'dailyStreak': dailyStreak,
@@ -103,6 +106,7 @@ class UserModel {
       dailyStreak:
       int.tryParse(map['dailyStreak']?.toString() ?? '0') ?? 0,
       id: map['id'] ?? '',
+      tokens: map['fcmToken']??'',
       name: map['name'] ?? '',
       password: map['password'] ?? '',
       phone: map['phone'] ?? '',

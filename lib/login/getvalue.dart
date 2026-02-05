@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderState
               backgroundColor: Color(0xffC8FFE0),
               child: Image.asset("assets/logo_noback.png", width: 90,),
             ),
-            Text("FUNS BIT",style: GoogleFonts.robotoSlab(
+            Text("ZOOKPLAYS",style: GoogleFonts.robotoSlab(
               textStyle: const TextStyle(color: Color(0xff16603B), letterSpacing: .5,fontSize: 27,fontWeight: FontWeight.w900),
             ),),
             Text("PLAY | MINE | EARN",style: GoogleFonts.robotoSlab(
@@ -137,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderState
             ),
             Text("Loading your Experience...",style: TextStyle(fontSize: 11,color: Colors.black),),
             Spacer(),
-            t("@ 2026 FunsBit "),
+            t("@ 2026 ZOOKPLAYS "),
             t("Version 1.0.0 "),
             SizedBox(height: 30,),
           ],

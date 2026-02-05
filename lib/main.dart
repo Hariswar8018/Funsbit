@@ -1,3 +1,4 @@
+import 'package:earning_app/admin/send_notification.dart';
 import 'package:earning_app/firebase_options.dart';
 import 'package:earning_app/game/crossword/game.dart';
 
@@ -7,9 +8,11 @@ import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/navigation/naviagtion.dart';
 import 'package:earning_app/navigation/second_pages/withdraw.dart';
 import 'package:earning_app/navigation/user/history.dart';
+import 'package:earning_app/navigation/user/notifications/show_notification.dart';
 import 'package:earning_app/router/app_router.dart' show AppRouter;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -20,13 +23,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'login/login.dart' show Login;
 
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  // Do NOT show notification here
+  debugPrint('Background message received: ${message.messageId}');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseMessaging.onBackgroundMessage(
+      firebaseMessagingBackgroundHandler);
 
+  await NowSendMeMessage.initLocalNotifications();
   await MobileAds.instance.initialize();
 
   final authService = AuthService();
@@ -53,16 +66,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /*return MaterialApp(
-        title: 'FunsBit',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-        ),
-      home:CustomCrossword(),
-    );*/
     return MaterialApp.router(
-      title: 'FunsBit',
+      title: 'ZOOKPLAYS',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
@@ -143,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderState
               backgroundColor: Color(0xffC8FFE0),
               child: Image.asset("assets/logo_noback.png", width: 90,),
             ),
-            Text("FUNS BIT",style: GoogleFonts.robotoSlab(
+            Text("ZOOKPLAYS",style: GoogleFonts.robotoSlab(
               textStyle: const TextStyle(color: Color(0xff16603B), letterSpacing: .5,fontSize: 27,fontWeight: FontWeight.w900),
             ),),
             Text("PLAY | MINE | EARN",style: GoogleFonts.robotoSlab(
@@ -170,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage>  with SingleTickerProviderState
             ),
             Text("Loading Login Screen...",style: TextStyle(fontSize: 11,color: Colors.black),),
             Spacer(),
-            t("@ 2026 FunsBit "),
+            t("@ 2026 ZOOKPLAYS "),
             t("Version 1.0.0 "),
             SizedBox(height: 30,),
           ],

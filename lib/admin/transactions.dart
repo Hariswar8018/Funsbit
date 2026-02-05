@@ -1,30 +1,29 @@
-import 'package:earning_app/card/transaction_card.dart';
+
+
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:earning_app/global/widget.dart';
-import 'package:earning_app/model/transaction.dart' show TransactionModel;
-import 'package:earning_app/navigation/user/service/transaction.dart';
+import 'package:earning_app/model/transaction.dart';
 import 'package:flutter/material.dart';
 
-class History extends StatefulWidget {
-  final String id;
-  const History({super.key,required this.id});
+class Transactions extends StatefulWidget {
+  final bool completed;
+  const Transactions({super.key,required this.completed});
 
   @override
-  State<History> createState() => _HistoryState();
+  State<Transactions> createState() => _TransactionsState();
 }
 
-class _HistoryState extends State<History> {
-
-  final service = TransactionService();
-
+class _TransactionsState extends State<Transactions> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          GlobalWidget.appbar(context, "Your Transactions"),
-          Flexible(
-            child: StreamBuilder<List<TransactionModel>>(
-              stream: service.getTransactions(widget.id),
+          GlobalWidget.appbar(context, "All Transactions"),
+          /*Flexible(
+            child:StreamBuilder(
+              stream: FirebaseFirestore.instance.collection("transactions").doc().snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
@@ -53,7 +52,7 @@ class _HistoryState extends State<History> {
                 );
               },
             ),
-          ),
+          )*/
         ],
       ),
     );

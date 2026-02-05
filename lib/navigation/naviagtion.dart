@@ -1,11 +1,16 @@
+import 'package:earning_app/admin/navigation.dart';
 import 'package:earning_app/global/color.dart';
 import 'package:earning_app/login/bloc/bloc.dart';
 import 'package:earning_app/navigation/games.dart';
 import 'package:earning_app/navigation/mining.dart';
 import 'package:earning_app/navigation/profile.dart';
+import 'package:earning_app/navigation/user/notifications/save_token.dart';
+import 'package:earning_app/navigation/user/notifications/show_notification.dart';
 import 'package:earning_app/navigation/user/update.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../navigation/home.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 
@@ -18,6 +23,146 @@ class MyNavigationPage extends StatefulWidget {
 }
 
 class _MyNavigationPageState extends State<MyNavigationPage> {
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+
+  void fg() async {
+    const AndroidInitializationSettings androidSettings =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings settings =
+    InitializationSettings(android: androidSettings);
+
+    await flutterLocalNotificationsPlugin.initialize(settings);
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('📩 Foreground message received');
+      print(message.data);
+      print(message.notification?.title);
+
+      if (message.notification != null) {
+        _showNotification(message);
+      }
+    });
+  }
+
+  Future<void> setupNotifications() async {
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel',
+      'High Importance Notifications',
+      description: 'Used for important notifications',
+      importance: Importance.max,
+    );
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+  }
+  Future<void> _showNotification(RemoteMessage message) async {
+    const AndroidNotificationDetails androidDetails =
+    AndroidNotificationDetails(
+      'high_importance_channel', // MUST MATCH channel
+      'High Importance Notifications',
+      channelDescription: 'Used for important notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+
+    const NotificationDetails details =
+    NotificationDetails(android: androidDetails);
+
+    await flutterLocalNotificationsPlugin.show(
+      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      message.notification!.title,
+      message.notification!.body,
+      details,
+    );
+  }
+  Future<void> createNotificationChannel() async {
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel', // MUST match below
+      'High Importance Notifications',
+      description: 'Used for important notifications',
+      importance: Importance.max,
+    );
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+  }
+
+  @override
+  void initState() {
+
+    super.initState();
+    start();
+  }
+  void start()async{
+    await setupNotifications();
+    await createNotificationChannel();
+    requestNotificationPermission();
+    fgi();
+    await send();
+  }
+  Future<void> send() async {
+    SaveToken.registerUserFCMToken(GlobalUser.user.id);
+
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    NowSendMeMessage.listenForegroundMessages();
+  }
+  void fgi(){
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('📩 Foreground message');
+      print(message.notification?.title);
+
+      if (message.notification != null) {
+        flutterLocalNotificationsPlugin.show(
+          DateTime.now().millisecondsSinceEpoch ~/ 1000,
+          message.notification!.title,
+          message.notification!.body,
+          const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'high_importance_channel',
+              'High Importance Notifications',
+              importance: Importance.max,
+              priority: Priority.high,
+              icon: '@mipmap/ic_launcher',
+            ),
+          ),
+        );
+      }
+    });
+
+  }
+
+
+  void requestNotificationPermission() async {
+    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('✅ User granted permission');
+      fg();
+    } else if (settings.authorizationStatus == AuthorizationStatus.denied) {
+      print('❌ User denied permission');
+    } else if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
+      print('❓ Permission not determined');
+    }
+  }
+
+  static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+
+  }
   final _pageController = PageController(initialPage: 0);
 
   final NotchBottomBarController _controller = NotchBottomBarController(index: 0);
@@ -36,6 +181,7 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
 
     super.dispose();
   }
+  bool b = GlobalUser.user.email=="samasiharisw@gmail.com";
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +191,7 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
       Level(),
       Profile(),
     ];
-    return GlobalUser.user.name.isEmpty?Update(user: GlobalUser.user,isback: false,):WillPopScope(
+    return b?NavigationAdmin():GlobalUser.user.name.isEmpty?Update(user: GlobalUser.user,isback: false,):WillPopScope(
         onWillPop: () async {
           final shouldExit = await showDialog<bool>(
             context: context,
@@ -142,7 +288,7 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
                 Icons.person,
                 color: Colors.yellow,
               ),
-              itemLabel: 'Page 4',
+              itemLabel: 'Profile',
             ),
           ],
           onTap: (index) {

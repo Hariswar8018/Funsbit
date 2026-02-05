@@ -99,7 +99,7 @@ class _LoginState extends State<Login> {
                   child: Image.asset("assets/logo_noback.png",height: 70,),
                 ),
               ),
-              Text("FUNSBIT",style: GoogleFonts.robotoSlab(
+              Text("ZOOKPLAYS",style: GoogleFonts.robotoSlab(
                 textStyle: const TextStyle(color: Color(0xff16603B), letterSpacing: .5,fontSize: 27,fontWeight: FontWeight.w900),
               ),),
               Text("PLAY | MINE | EARN",style: GoogleFonts.robotoSlab(
@@ -240,7 +240,7 @@ class _LoginState extends State<Login> {
                 child: Image.asset("assets/logo_noback.png",height: 70,),
               ),
             ),
-            Text("FUNSBIT",style: GoogleFonts.robotoSlab(
+            Text("ZOOKPLAYS",style: GoogleFonts.robotoSlab(
               textStyle: const TextStyle(color: Color(0xff16603B), letterSpacing: .5,fontSize: 27,fontWeight: FontWeight.w900),
             ),),
             Text("PLAY | MINE | EARN",style: GoogleFonts.robotoSlab(
