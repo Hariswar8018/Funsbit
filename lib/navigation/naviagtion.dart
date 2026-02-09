@@ -104,11 +104,15 @@ class _MyNavigationPageState extends State<MyNavigationPage> {
     start();
   }
   void start()async{
-    await setupNotifications();
-    await createNotificationChannel();
-    requestNotificationPermission();
-    fgi();
-    await send();
+    try {
+      await setupNotifications();
+      await createNotificationChannel();
+      requestNotificationPermission();
+      fgi();
+      await send();
+    }catch(e){
+      print(e);
+    }
   }
   Future<void> send() async {
     SaveToken.registerUserFCMToken(GlobalUser.user.id);

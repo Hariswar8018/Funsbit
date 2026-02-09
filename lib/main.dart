@@ -23,12 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'login/login.dart' show Login;
 
-@pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  // Do NOT show notification here
-  debugPrint('Background message received: ${message.messageId}');
-}
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,10 +31,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseMessaging.onBackgroundMessage(
-      firebaseMessagingBackgroundHandler);
-
-  await NowSendMeMessage.initLocalNotifications();
   await MobileAds.instance.initialize();
 
   final authService = AuthService();
